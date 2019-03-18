@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.2)
+cmake_minimum_required (VERSION 3.10.0)
 project(IDATag)
 
 include(common.cmake)
@@ -29,6 +29,8 @@ set_target_output_directory(${PROJECT_NAME} "")
 target_include_directories(${PROJECT_NAME} PRIVATE ";${IDASDK}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE ";${QTHEADER}")
 
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
+
 if("$ENV{IDATARGET}" STREQUAL "IDA64")
     target_compile_definitions(${PROJECT_NAME} PRIVATE 
 		__NT__
@@ -36,8 +38,8 @@ if("$ENV{IDATARGET}" STREQUAL "IDA64")
 		__X64__
 		__EA64__
 		USE_DANGEROUS_FUNCTIONS
+		USE_STANDARD_FILE_FUNCTIONS
 		__QT__
-		__UI__
 		QT_NAMESPACE=QT
 		QT_DLL
 		QT_GUI_LIB
@@ -58,8 +60,8 @@ elseif("$ENV{IDATARGET}" STREQUAL "IDA32")
 		__IDP__
 		__X64__
 		USE_DANGEROUS_FUNCTIONS
+		USE_STANDARD_FILE_FUNCTIONS
 		__QT__
-		__UI__
 		QT_NAMESPACE=QT
 		QT_DLL
 		QT_GUI_LIB

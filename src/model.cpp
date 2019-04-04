@@ -15,11 +15,11 @@ void Idatag_model::init_model()
 	print_stats_model();
 }
 
-int Idatag_model::count_stats_tags()
+const int Idatag_model::count_stats_tags() const
 {
 	int count = 0;
-	for (std::vector<Offset>::iterator it = mydata.begin(); it != mydata.end(); ++it) {
-		count += (*it).count_tags();
+	for (const auto& it : mydata) {
+		count += it.count_tags();
 	}
 	return count;
 }
@@ -31,12 +31,12 @@ void Idatag_model::print_stats_model()
 	msg("[IDATag] Tags : %d on %d offsets!", nb_tags, nb_offsets);
 }
 
-std::vector<Offset> Idatag_model::get_data() const 
+const std::vector<Offset>& Idatag_model::get_data() const 
 {
 	return mydata;
 }
 
-std::vector<std::string> Idatag_model::get_feeders() const 
+const std::vector<std::string>& Idatag_model::get_feeders() const 
 {
 	return myfeeders;
 }
@@ -64,6 +64,8 @@ QVariant Idatag_model::data(const QModelIndex &index, int role) const
 	uint64_t rva;
 	std::string name;
 	QString qstr_name;
+	std::string tags;
+	QString qstr_tags;
 
 	if (!index.isValid()) {
 		return QVariant();
@@ -95,7 +97,9 @@ QVariant Idatag_model::data(const QModelIndex &index, int role) const
 			qstr_name = QString::fromStdString(name);
 			return qstr_name;
 		case 2:
-			return "tags";
+			tags = offset->get_tags();
+			qstr_tags = QString::fromStdString(tags);
+			return qstr_tags;
 	}
 	return QVariant();
 }
@@ -104,7 +108,7 @@ QVariant Idatag_model::data(const QModelIndex &index, int role) const
 //bool Idatag_model::insertRows(int position, int rows, const QModelIndex $index = QModelIndex()) {}
 //bool Idatag_model::removeRows(int position, int rows, const QModelIndex $index = QModelIndex()) {}
 
-void Idatag_model::add_offset(uint64_t rva) 
+void Idatag_model::add_offset(const uint64_t& rva) 
 {
 	Offset offset(rva);
 	mydata.push_back(offset);
@@ -115,25 +119,30 @@ void Idatag_model::add_offset(Offset& offset)
 	mydata.push_back(offset);
 }
 
-Offset* Idatag_model::get_offset_byrva(uint64_t rva)
+Offset* Idatag_model::get_offset_byrva(const uint64_t& rva)
 {
 	if (!check_rva(rva)) {
 		return NULL;
 	}
-	for (std::vector<Offset>::iterator it = mydata.begin(); it != mydata.end(); ++it) {
-		if (it->get_rva() == rva) {
-			return &(*it);
+	for (auto& it : mydata) 
+	{
+		if (it.get_rva() == rva)
+		{
+			return &it;
 		}
 	}
 
 	Offset offset = Offset(rva);
 	add_offset(offset);
 
-	for (std::vector<Offset>::iterator it = mydata.begin(); it != mydata.end(); ++it) {
-		if (it->get_rva() == rva) {
-			return &(*it);
+	for (auto& it : mydata)
+	{
+		if (it.get_rva() == rva)
+		{
+			return &it;
 		}
 	}
+
 	return NULL;
 }
 
@@ -143,17 +152,19 @@ const Offset* Idatag_model::get_offset_byindex(int index) const
 	return offset;
 }
 
-void Idatag_model::remove_offset(uint64_t rva)
+bool Idatag_model::compare_offset_rva(const uint64_t& rva, Offset& offset) const
+{
+	if (offset.get_rva() == rva) return true;
+	return false;
+}
+
+void Idatag_model::remove_offset(const uint64_t& rva)
 {
 	if (!check_rva(rva)) {
 		return;
 	}
-	for (std::vector<Offset>::iterator it = mydata.begin(); it != mydata.end(); ++it) {
-		if (it->get_rva() == rva) {
-			it = mydata.erase(it);
-			break;
-		}
-	}
+
+	auto it = std::remove_if(mydata.begin(), mydata.end(), [&](Offset offset) {return compare_offset_rva(rva, offset); });
 }
 
 void Idatag_model::add_feeder(std::string& feeder) 
@@ -163,12 +174,8 @@ void Idatag_model::add_feeder(std::string& feeder)
 
 void Idatag_model::remove_feeder(std::string& feeder) 
 {
-	for (std::vector<std::string>::iterator it = myfeeders.begin(); it != myfeeders.end(); ++it) {
-		if (it->compare(feeder)) {
-			it = myfeeders.erase(it);
-			break;
-		}
-	}
+	auto it = std::find(myfeeders.begin(), myfeeders.end(), feeder);
+	if (it != myfeeders.end()) myfeeders.erase(it);
 }
 
 void Idatag_model::gather_name_idb()
@@ -205,35 +212,31 @@ void Idatag_model::import_info_disas()
 	gather_function_idb();
 }
 
-void Idatag_model::import_feed(json& j_feed, Offset& offset)
+void Idatag_model::import_feed(const json& j_feed, Offset& offset)
 {
 	uint64_t rva = j_feed["offset"];
 	std::string label = j_feed["tag"];
 	std::string feeder = j_feed["feeder"];
 
-	if (!offset.check_already_tagged(label))
-	{
-		Tag tag = Tag(label, feeder);
-		offset.add_tag(tag);
-	}
+	if (!check_rva(rva)) return;
+	if (offset.check_already_tagged(label)) return;
+
+	Tag tag = Tag(label, feeder);
+	offset.add_tag(tag);
 }
 
 void Idatag_model::import_feeds(json& j_feeds)
 {
 	try {
-		for (auto it = j_feeds.begin(); it != j_feeds.end(); it++)
+		for (const auto&  it : j_feeds)
 		{
-			if (!((*it)["offset"].empty()
-				&& (*it)["tag"].empty()
-				&& (*it)["feeder"].empty()))
+			if (!(it["offset"].empty() || it["tag"].empty() || it["feeder"].empty()))
 			{
-				uint64_t rva = (*it)["offset"];
+				uint64_t rva = it["offset"];
 				Offset* offset = get_offset_byrva(rva);
-				if (offset == NULL)
-				{
-					return;
-				}
-				import_feed(*it, *offset);
+				if (offset == NULL) return;
+				
+				import_feed(it, *offset);
 			}
 		}
 	}
@@ -242,7 +245,7 @@ void Idatag_model::import_feeds(json& j_feeds)
 	}
 }
 
-void Idatag_model::import_file(fs::path filepath)
+void Idatag_model::import_file(const fs::path& filepath)
 {
 	try {
 		std::ifstream ifs(filepath);
@@ -254,7 +257,7 @@ void Idatag_model::import_file(fs::path filepath)
 	}
 }
 
-void Idatag_model::import_files(fs::path& path_tags)
+void Idatag_model::import_files(const fs::path& path_tags)
 {
 	try {
 		for (const auto & entry : fs::directory_iterator(path_tags))
@@ -285,26 +288,28 @@ void Idatag_model::import_tags()
 	}
 }
 
-void Idatag_model::export_tags()
+void Idatag_model::export_tags() const
 {
 	msg("[IDATAG] Export not yet implemented");
 }
 
-Offset::Offset(uint64_t rva_init, std::string name_init) 
+Offset::Offset(const uint64_t& rva_init, const std::string& name_init) 
 {
 	rva = rva_init;
 	name = name_init;
 }
 
-Offset::Offset(uint64_t rva_init)
+Offset::Offset(const uint64_t& rva_init)
 {
 	rva = rva_init;
 }
 
-bool Offset::check_already_tagged(std::string label)
+bool Offset::check_already_tagged(std::string& label) const
 {
-	for (std::vector<Tag>::iterator it = tags.begin(); it != tags.end(); ++it) {
-		if (it->get_label().compare(label))
+	for (const auto & it : tags)
+	{
+		const std::string lbl = it.get_label();
+		if (lbl.compare(label) == 0)
 		{
 			return true;
 		}
@@ -312,60 +317,72 @@ bool Offset::check_already_tagged(std::string label)
 	return false;
 }
 
-void Offset::add_tag(Tag tag) 
+void Offset::add_tag(Tag& tag) 
 {
 	tags.push_back(tag);
 }
 
-void Offset::remove_tag(std::string label) 
+const std::string Offset::get_tags() const
 {
-	for (std::vector<Tag>::iterator it = tags.begin(); it != tags.end(); ++it) {
-		if (it->get_label().compare(label)) {
-			it = tags.erase(it);
-			break;
+	std::string str_tags;
+	for (const auto& it : tags)
+	{
+		str_tags += it.get_label();
+		str_tags += " ";
+	}
+	return str_tags;
+}
+
+void Offset::remove_tag(std::string& label) 
+{
+	for (const auto & it : tags)
+	{
+		if (it.get_label().compare(label))
+		{
+			it.~Tag();
 		}
 	}
 }
 
-uint64_t Offset::count_tags() 
+const uint64_t Offset::count_tags() const
 {
 	return tags.size();
 }
 
-uint64_t Offset::get_rva() const 
+const uint64_t Offset::get_rva() const 
 {
 	return rva;
 }
 
-std::string Offset::get_name() const 
+const std::string Offset::get_name() const 
 {
 	return name;
 }
 
-Tag::Tag(std::string label_init, std::string signature_init)
+Tag::Tag(std::string& label_init, std::string& signature_init)
 {
 	label = label_init;
 	signature = signature_init;
 }
 
-Tag::Tag(std::string label_init, std::string type_init, std::string signature_init)
+Tag::Tag(std::string& label_init, std::string& type_init, std::string& signature_init)
 {
 	label = label_init;
 	type = type_init;
 	signature = signature_init;
 }
 
-std::string Tag::get_label() const 
+const std::string Tag::get_label() const 
 {
 	return label;
 }
 
-std::string Tag::get_type() const 
+const std::string Tag::get_type() const 
 {
 	return type;
 }
 
-std::string Tag::get_signature() const 
+const std::string Tag::get_signature() const 
 {
 	return signature;
 }

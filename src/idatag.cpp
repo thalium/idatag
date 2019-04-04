@@ -16,6 +16,7 @@ bool idaapi run(size_t)
 	{
 		msg("[IDATAG] Already loaded. Please close the tab first to run it again.\n");
 	}
+	
 	return true;
 }
 

@@ -11,11 +11,13 @@
 #include <QtCore/Qt>
 
 #include "model.hpp"
+#include "proxy.hpp"
 
 class Idatag_view : public QT::QWidget{
 	
 private:
 	Idatag_model*		myModel;
+	Idatag_proxy*		myProxy;
 	QWidget*			parent;
 	QTableView*			tb;
 	QHeaderView*		hheader;
@@ -29,4 +31,7 @@ private:
 public:
 	Idatag_view(QT::QWidget*, Idatag_model*);
 	~Idatag_view();
+
+	void OnFilter_empty();
+	void OnFilter_string();
 };

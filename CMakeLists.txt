@@ -1,7 +1,14 @@
 cmake_minimum_required (VERSION 3.10.0)
 project(IDATag)
 
-include(common.cmake)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+
+#set(QT_MOC_EXECUTABLE "$ENV{QTHEADER}/../bin/moc.exe")
+set(CMAKE_PREFIX_PATH "C:\\Qt\\Qt5.3.0\\5.3\\msvc2013_64")
+find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
+
 get_filename_component(root_dir     ${CMAKE_CURRENT_SOURCE_DIR} ABSOLUTE)
 get_filename_component(bin_d_dir    ${root_dir}/bin/${PROJECT_NAME}_debug_${ARCH} ABSOLUTE)
 get_filename_component(bin_dir      ${root_dir}/bin/${PROJECT_NAME}_${ARCH} ABSOLUTE)
@@ -24,12 +31,34 @@ endif()
 get_filename_component(QTHEADER "$ENV{QTHEADER}" ABSOLUTE)
 message("-- Using QTHEADER=$ENV{QTHEADER}")
 
-add_target(${PROJECT_NAME} ${PROJECT_NAME} "${root_dir}/src" OPTIONS shared warnings)
-set_target_output_directory(${PROJECT_NAME} "")
+add_library(${PROJECT_NAME}  SHARED
+	src/idatag.hpp
+	src/idatag.cpp
+	src/json.hpp
+	src/model.hpp
+	src/model.cpp
+	src/view.hpp
+	src/view.cpp
+	src/proxy.hpp
+	src/proxy.cpp
+	src/delegate.hpp
+	src/delegate.cpp
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG          "${CMAKE_BINARY_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE        "${CMAKE_BINARY_DIR}/bin"
+	LIBRARY_OUTPUT_DIRECTORY_DEBUG          "${CMAKE_BINARY_DIR}/bin"
+	LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
+	LIBRARY_OUTPUT_DIRECTORY_RELEASE        "${CMAKE_BINARY_DIR}/bin"
+   )
+
 target_include_directories(${PROJECT_NAME} PRIVATE ";${IDASDK}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE ";${QTHEADER}")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
+
 
 if("$ENV{IDATARGET}" STREQUAL "IDA64")
     target_compile_definitions(${PROJECT_NAME} PRIVATE 
@@ -53,6 +82,9 @@ if("$ENV{IDATARGET}" STREQUAL "IDA64")
 		"${IDASDK}/lib/x64_win_qt/Qt5Gui.lib"
 	)
 	set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX "64.dll")
+	# C4267 : IDA SDK => conversion size_t to int (pro.h)
+	# C4244 : IDA SDK => conversion size_t to int (idp.hpp)
+	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/wd4267 /wd4244")
 
 elseif("$ENV{IDATARGET}" STREQUAL "IDA32")
 	target_compile_definitions(${PROJECT_NAME} PRIVATE 
@@ -74,4 +106,8 @@ elseif("$ENV{IDATARGET}" STREQUAL "IDA32")
 		"${IDASDK}/lib/x64_win_qt/Qt5Widgets.lib"
 		"${IDASDK}/lib/x64_win_qt/Qt5Gui.lib"
 	)
+	# C4267 : IDA SDK => conversion size_t to int (pro.h)
+	# C4244 : IDA SDK => conversion size_t to int (idp.hpp)
+	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/wd4267 /wd4244")
+
 endif()

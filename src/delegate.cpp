@@ -1,7 +1,10 @@
 #include "delegate.hpp"
 
 
-Idatag_delegate_rva::Idatag_delegate_rva(QT::QWidget* parent, Idatag_model* myModel) {}
+Idatag_delegate_rva::Idatag_delegate_rva(QT::QWidget* parent, Idatag_model* myModel) :
+	QStyledItemDelegate()
+{
+}
 Idatag_delegate_rva::~Idatag_delegate_rva() {}
 
 void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const 
@@ -20,7 +23,8 @@ void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& o
 	}
 }
 
-Idatag_delegate_name::Idatag_delegate_name(QT::QWidget* parent, Idatag_model* myModel)
+Idatag_delegate_name::Idatag_delegate_name(QT::QWidget* parent, Idatag_model* myModel) :
+	QStyledItemDelegate()
 {
 	this->parent = parent;
 	this->myModel = myModel;
@@ -42,7 +46,8 @@ void Idatag_delegate_name::paint(QPainter *painter, const QStyleOptionViewItem& 
 }
 
 
-Idatag_delegate_tag::Idatag_delegate_tag(QT::QWidget* parent, Idatag_model* myModel, QT::QTableView* myView)
+Idatag_delegate_tag::Idatag_delegate_tag(QT::QWidget* parent, Idatag_model* myModel, QT::QTableView* myView) :
+	QStyledItemDelegate()
 {
 	this->parent = parent;
 	this->myModel = myModel;
@@ -57,7 +62,7 @@ void Idatag_delegate_tag::paint(QPainter *painter, const QStyleOptionViewItem& o
 	
 	const Offset* offset = index.data().value<const Offset*>();
 	if (offset != NULL) {
-		myView->openPersistentEditor(index);
+		myView->openPersistentEditor(index); // isPersistentEditorOpen introduced in Qt5.10 (IDA7.2 offers Qt5.3)
 	}
 	else {
 		QStyledItemDelegate::paint(painter, option, index);

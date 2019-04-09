@@ -1,7 +1,7 @@
 #include "palette.hpp"
 
 
-Idatag_palette::Idatag_palette(std::vector<std::string>* feeders)
+Idatag_palette::Idatag_palette(const std::vector<std::string>& feeders)
 {
 	this->feeders = feeders;
 	QColor colour;
@@ -12,7 +12,7 @@ Idatag_palette::Idatag_palette(std::vector<std::string>* feeders)
 
 	srand(time(NULL));
 
-	for (const auto & feeder : *feeders) {
+	for (const auto & feeder : feeders) {
 		if (hue > 359) {
 			colour = colour.fromHsv(rand() % 359, rand() % 240 + 128, value, alpha);
 			this->association.insert(std::pair<std::string, QColor>(feeder, colour));

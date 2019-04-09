@@ -52,6 +52,7 @@ Idatag_delegate_tag::Idatag_delegate_tag(QT::QWidget* parent, Idatag_model* myMo
 	this->parent = parent;
 	this->myModel = myModel;
 	this->myView = myView;
+	this->myPalette = new Idatag_palette(this->myModel->get_feeders());
 }
 
 Idatag_delegate_tag::~Idatag_delegate_tag() {}
@@ -78,17 +79,12 @@ QT::QWidget* Idatag_delegate_tag::createEditor(QWidget* parent, const QStyleOpti
 {
 	const Offset* offset = index.data().value<const Offset*>();
 	std::vector<Tag> tags = offset->get_tags();
-	//if (!tags.empty()) {
 		Idatag_wall* wall = new Idatag_wall(parent, myModel, myView, index, offset);
 		//wall->clear_tags();
 		for (const auto &tag : tags) {
-			wall->generate_tag(tag);
+			wall->generate_graph(tag);
 		}
 		return wall;
-	//}
-	//else {
-	//	QStyledItemDelegate::createEditor(parent, option, index);
-	//}
 }
 
 Idatag_wall::Idatag_wall(QT::QWidget* parent, Idatag_model* myModel, QTableView* myView, const QModelIndex& index, const Offset* offset) :
@@ -111,7 +107,7 @@ void Idatag_wall::clear_tags()
 	msg("\nclear");
 }
 
-void Idatag_wall::generate_tag(Tag tag)
+void Idatag_wall::generate_graph(Tag tag)
 {
 	Idatag_graph* graph = new Idatag_graph(this, tag);
 	this->layout->addWidget(graph);
@@ -128,4 +124,26 @@ Idatag_graph::Idatag_graph(Idatag_wall* wall, Tag tag) :
 	this->setText(qlabel);
 
 	this->setStyleSheet("background: rgb(200,100,150);border-radius: 10px; font-weight: bold; color: white;");
+}
+
+Idatag_wallEditor::Idatag_wallEditor(Idatag_wall* wall) :
+	QLineEdit(wall)
+{
+
+}
+
+void Idatag_wallEditor::add_graph()
+{
+
+}
+
+Idatag_graphEditor::Idatag_graphEditor(Idatag_wall* wall) :
+	QLineEdit(wall)
+{
+
+}
+
+void Idatag_graphEditor::replace_graph()
+{
+
 }

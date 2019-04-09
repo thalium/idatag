@@ -1,3 +1,5 @@
+#pragma once
+
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMenu>
@@ -12,9 +14,10 @@
 
 #include "model.hpp"
 #include "proxy.hpp"
+#include "delegate.hpp"
 
 class Idatag_view : public QT::QWidget{
-	
+	Q_OBJECT
 private:
 	Idatag_model*		myModel;
 	Idatag_proxy*		myProxy;

@@ -1,42 +1,46 @@
 #include "view.hpp"
 
-Idatag_view::Idatag_view(QT::QWidget* parent_init, Idatag_model* myModel_init) {
+Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel) {
 
-	myModel = myModel_init;
-	parent = parent_init;
+	this->myModel = myModel;
+	this->parent = parent;
 
-	tb = new QTableView();
-	tb->setSortingEnabled(true);
+	this->tb = new QTableView();
+	this->tb->setSortingEnabled(true);
 
-	myProxy = new Idatag_proxy(myModel);
-	myProxy->setSourceModel(myModel);
+	this->myProxy = new Idatag_proxy(this->myModel);
+	this->myProxy->setSourceModel(this->myModel);
 
-	tb->setModel(myProxy);
+	this->tb->setModel(myProxy);
 
-	tb->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	tb->resizeColumnsToContents();
+	this->tb->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	this->tb->resizeColumnsToContents();
 
-	hheader = tb->horizontalHeader();
-	hheader->setSectionsMovable(true);
-	hheader->setSectionResizeMode(0, QHeaderView::Interactive);
-	hheader->setSectionResizeMode(1, QHeaderView::Interactive);
-	hheader->setSectionResizeMode(2, QHeaderView::Stretch);
-	hheader->setDefaultAlignment(Qt::AlignLeft);
+	this->tb->setItemDelegateForColumn(0, new Idatag_delegate_rva(this->parent, this->myModel));
+	this->tb->setItemDelegateForColumn(1, new Idatag_delegate_name(this->parent, this->myModel));
+	this->tb->setItemDelegateForColumn(2, new Idatag_delegate_tag(this->parent, this->myModel, this->tb));
 
-	cbox = new QCheckBox();
-	cbox->setText("Filter not tagged offsets");
-	connect(cbox, &QCheckBox::stateChanged, this, &Idatag_view::OnFilter_empty);
+	this->hheader = this->tb->horizontalHeader();
+	this->hheader->setSectionsMovable(true);
+	this->hheader->setSectionResizeMode(0, QHeaderView::Interactive);
+	this->hheader->setSectionResizeMode(1, QHeaderView::Interactive);
+	this->hheader->setSectionResizeMode(2, QHeaderView::Stretch);
+	this->hheader->setDefaultAlignment(Qt::AlignLeft);
 
-	tf = new QLineEdit();
-	QLabel* tfl = new QLabel();
-	tfl->setText("Search: ");
-	connect(tf, &QLineEdit::textChanged, this, &Idatag_view::OnFilter_string);
+	this->cbox = new QCheckBox();
+	this->cbox->setText("Filter not tagged offsets");
+	connect(this->cbox, &QCheckBox::stateChanged, this, &Idatag_view::OnFilter_empty);
 
-	layout = new QGridLayout(parent);
-	layout->addWidget(tb, 0, 0, 1, 0);
-	layout->addWidget(tfl, 1, 0);
-	layout->addWidget(tf, 1, 1);
-	layout->addWidget(cbox, 1, 2);
+	this->tf = new QLineEdit();
+	this->tfl = new QLabel();
+	this->tfl->setText("Search: ");
+	connect(this->tf, &QLineEdit::textChanged, this, &Idatag_view::OnFilter_string);
+
+	this->layout = new QGridLayout(parent);
+	this->layout->addWidget(this->tb, 0, 0, 1, 0);
+	this->layout->addWidget(this->tfl, 1, 0);
+	this->layout->addWidget(this->tf, 1, 1);
+	this->layout->addWidget(this->cbox, 1, 2);
 }
 
 Idatag_view::~Idatag_view() {}
@@ -44,28 +48,28 @@ Idatag_view::~Idatag_view() {}
 
 void Idatag_view::OnFilter_string()
 {
-	QString filter_text = tf->text();
-	myProxy->set_filter_string(filter_text);
-	myProxy->invalidateFilter();
+	QString filter_text = this->tf->text();
+	this->myProxy->set_filter_string(filter_text);
+	this->myProxy->invalidateFilter();
 }
 
 void Idatag_view::OnFilter_empty() 
 {
-	Qt::CheckState state = cbox->checkState();
+	Qt::CheckState state = this->cbox->checkState();
 	switch (state)
 	{
 	case Qt::Checked:
-		myProxy->set_filter_empty(Qt::Checked);
+		this->myProxy->set_filter_empty(Qt::Checked);
 		break;
 	case Qt::Unchecked:
-		myProxy->set_filter_empty(Qt::Unchecked);
+		this->myProxy->set_filter_empty(Qt::Unchecked);
 		break;
 	case Qt::PartiallyChecked:
-		cbox->setCheckState(Qt::Unchecked);
+		this->cbox->setCheckState(Qt::Unchecked);
 		break;
 	default:
 		msg("[IDATAG] Erreur d'état du filtre checkbox\n");
-		cbox->setCheckState(Qt::Unchecked);
+		this->cbox->setCheckState(Qt::Unchecked);
 	}
-	myProxy->invalidateFilter();
+	this->myProxy->invalidateFilter();
 }

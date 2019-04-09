@@ -6,6 +6,7 @@
 #include "model.hpp"
 
 class Idatag_proxy : public QT::QSortFilterProxyModel {
+	Q_OBJECT
 public:
 	Idatag_proxy(Idatag_model* myModel);
 	~Idatag_proxy();

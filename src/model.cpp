@@ -82,7 +82,7 @@ QVariant Idatag_model::data(const QModelIndex &index, int role) const
 		return QVariant();
 	}
 
-	const Offset* offset = get_offset_byindex(row);
+	Offset* offset = get_offset_byindex(row);
 	if (offset == NULL) return QVariant();
 
 	switch(column) 
@@ -141,9 +141,10 @@ Offset* Idatag_model::get_offset_byrva(const uint64_t& rva)
 	return NULL;
 }
 
-const Offset* Idatag_model::get_offset_byindex(int index) const 
+Offset* Idatag_model::get_offset_byindex(int index) const 
 {
-	const Offset* offset = &this->mydata[index];
+	const Offset* off = &this->mydata[index];
+	Offset* offset = const_cast<Offset *>(off);
 	return offset;
 }
 

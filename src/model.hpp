@@ -58,8 +58,8 @@ public:
 	void remove_tag(std::string&);
 	const uint64_t count_tags() const;
 };
-Q_DECLARE_METATYPE(const Offset*)
-Q_DECLARE_OPAQUE_POINTER(const Offset*)
+Q_DECLARE_METATYPE(Offset*)
+Q_DECLARE_OPAQUE_POINTER(Offset*)
 
 class Idatag_model : public QT::QAbstractTableModel {
 	Q_OBJECT
@@ -86,7 +86,7 @@ public:
 	void add_offset(Offset&);
 	//void remove_offset(const uint64_t&);
 	Offset* get_offset_byrva(const uint64_t&);
-	const Offset* get_offset_byindex(int) const ;
+	Offset* get_offset_byindex(int) const ;
 	bool compare_offset_rva(const uint64_t&, Offset&) const;
 
 	void add_feeder(std::string&);

@@ -86,16 +86,20 @@ class Idatag_graph : public QPushButton
 	Q_OBJECT
 private:
 	Idatag_wall* wall;
+	Idatag_model* myModel;
+	QTableView* myView;
+	Offset* offset;
+	QModelIndex index;
 	Tag tag;
 	QColor colour;
 
 public:
-	Idatag_graph(Idatag_wall*, Tag, QColor);
+	Idatag_graph(Idatag_wall*, Idatag_model*, QTableView*, Offset*, const QModelIndex&, Tag, QColor);
 	QString get_graph_style(QColor);
+	void mouseDoubleClickEvent(QMouseEvent*);
 	
 public slots:
 	void edit_graph();
-	void check_doubleClicked();
 signals :
 	void doubleClicked();
 };

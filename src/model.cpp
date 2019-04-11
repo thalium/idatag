@@ -292,7 +292,8 @@ void Idatag_model::export_tags() const
 
 Offset::Offset()
 {
-
+	this->rva = 0;
+	this->name = "";
 }
 
 Offset::Offset(const Offset& offset)
@@ -333,27 +334,18 @@ const std::vector<Tag> Offset::get_tags() const
 	return this->tags;
 }
 
-/*
-const std::string Offset::get_tags() const
+bool Offset::compare_tag_label(const std::string& label, Tag& tag) const
 {
-	std::string str_tags;
-	for (const auto& it : tags)
-	{
-		str_tags += it.get_label();
-		str_tags += " ";
+	if (tag.get_label().compare(label) == 0) {
+		return true;
 	}
-	return str_tags;
+	return false;
 }
-*/
+
 void Offset::remove_tag(std::string& label) 
 {
-	for (const auto & tag : this->tags)
-	{
-		if (tag.get_label().compare(label))
-		{
-			tag.~Tag();
-		}
-	}
+	auto it = std::remove_if(this->tags.begin(), this->tags.end(), [&](Tag tag) {return compare_tag_label(label, tag); });
+	this->tags.erase(it);
 }
 
 const uint64_t Offset::count_tags() const

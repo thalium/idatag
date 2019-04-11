@@ -76,7 +76,8 @@ QT::QWidget* Idatag_delegate_tag::createEditor(QWidget* parent, const QStyleOpti
 	std::vector<Tag> tags = offset->get_tags();
 	Idatag_wall* wall = new Idatag_wall(parent, this->myModel,this->myView, this->myPalette, index, offset);
 	wall->clear_tags();
-	for (const auto &tag : tags) {
+	for (auto &tag : tags) {
+		msg("\nCreate : %s", tag.get_label());
 		wall->generate_graph(tag);
 	}
 	return wall;
@@ -117,14 +118,14 @@ void Idatag_wall::clear_tags()
 {
 	QLayoutItem* graph;
 	while ((graph = this->layout->takeAt(0)) != 0) {
-			delete graph;
+		delete graph;
 	}
 }
 
 void Idatag_wall::generate_graph(Tag tag)
 {
 	QColor colour = this->myPalette->get_feeder_colour(tag.get_signature());
-	Idatag_graph* graph = new Idatag_graph(this, tag, colour);
+	Idatag_graph* graph = new Idatag_graph(this, this->myModel, this->myView, this->offset, this->index, tag, colour);
 	this->layout->addWidget(graph);
 }
 
@@ -152,10 +153,14 @@ QString Idatag_graph::get_graph_style(QColor colour)
 	return style;
 }
 
-Idatag_graph::Idatag_graph(Idatag_wall* wall, Tag tag, QColor colour) :
+Idatag_graph::Idatag_graph(Idatag_wall* wall, Idatag_model* myModel, QTableView* myView, Offset* offset, const QModelIndex& index, Tag tag, QColor colour) :
 	QPushButton(wall)
 {
 	this->wall = wall;
+	this->myModel = myModel;
+	this->myView = myView;
+	this->offset = offset;
+	this->index = index;
 	this->tag = tag;
 	this->colour = colour;
 
@@ -175,18 +180,19 @@ Idatag_graph::Idatag_graph(Idatag_wall* wall, Tag tag, QColor colour) :
 	this->setMaximumHeight(height);
 	this->setMinimumHeight(height);
 
-	//connect((QPushButton*)this->, &Idatag_graph::clicked , this, &Idatag_graph::check_doubleClicked);
-	//connect(this, &Idatag_graph::doubleClicked, this, &Idatag_graph::edit_graph);
+	connect(this, &Idatag_graph::doubleClicked, this, &Idatag_graph::edit_graph);
 }
 
 void Idatag_graph::edit_graph()
 {
-	//FIXME
+	Idatag_graphEditor* graphEditor = new Idatag_graphEditor(this, this->myModel, this->index, this->myView, this->offset);
+	graphEditor->show();
+	graphEditor->setFocus();
 }
 
-void Idatag_graph::check_doubleClicked()
+void Idatag_graph::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	//FIXME
+	emit doubleClicked();
 }
 
 Idatag_wallEditor::Idatag_wallEditor(Idatag_wall* wall, Idatag_model* myModel, const QModelIndex& index, QTableView* myView, Offset* offset) :
@@ -231,9 +237,7 @@ Idatag_graphEditor::Idatag_graphEditor(Idatag_graph* graph, Idatag_model* myMode
 
 	this->prev_tag = this->graph->text();
 	this->setText(this->prev_tag);
-	QWidget* wall = this->graph->parentWidget();
-	QTableView* tb = (QTableView* )wall->parentWidget();
-	this->setMinimumWidth(tb->columnWidth(2));
+	this->setMinimumWidth(this->myView->columnWidth(2));
 	this->selectAll();
 
 	connect(this, &QLineEdit::returnPressed, this, &Idatag_graphEditor::replace_graph);
@@ -243,15 +247,16 @@ void Idatag_graphEditor::replace_graph()
 {
 	std::string tag_del = prev_tag.toStdString();
 	this->offset->remove_tag(tag_del);
-
-	QStringList labels = this->text().split(" ");
-	for (const auto & qlabel : labels)
-	{
-		std::string feeder = "IDA";
-		std::string label = qlabel.toStdString();
-		Tag tag = Tag(label, feeder);
-		this->offset->add_tag(tag);
-		this->myModel->add_feeder(feeder);
+	if (!this->text().isEmpty()) {
+		QStringList labels = this->text().split(" ");
+		for (const auto & qlabel : labels)
+		{
+			std::string feeder = "IDA";
+			std::string label = qlabel.toStdString();
+			Tag tag = Tag(label, feeder);
+			this->offset->add_tag(tag);
+			this->myModel->add_feeder(feeder);
+		}
 	}
 	this->close();
 	this->myView->closePersistentEditor(this->index);

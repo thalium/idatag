@@ -51,9 +51,9 @@ public:
 	const std::string get_name() const;
 
 	bool check_already_tagged(std::string&) const;
+	bool compare_tag_label(const std::string&, Tag&) const;
 
 	void add_tag(Tag&);
-	//const std::string get_tags() const;
 	const std::vector<Tag> get_tags() const;
 	void remove_tag(std::string&);
 	const uint64_t count_tags() const;

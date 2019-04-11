@@ -43,6 +43,8 @@ add_library(${PROJECT_NAME}  SHARED
 	src/proxy.cpp
 	src/delegate.hpp
 	src/delegate.cpp
+	src/palette.hpp
+	src/palette.cpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

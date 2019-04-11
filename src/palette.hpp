@@ -13,5 +13,5 @@ private:
 public:
 	Idatag_palette(const std::vector<std::string>&);
 	void add_feeder_colour(std::string&);
-	QColor	get_feeder_colour(std::string&);
+	QColor	get_feeder_colour(const std::string&);
 };

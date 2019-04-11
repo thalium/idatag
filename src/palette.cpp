@@ -34,7 +34,7 @@ void Idatag_palette::add_feeder_colour(std::string& feeder)
 	this->association.insert(std::pair<std::string, QColor>(feeder, colour));
 }
 
-QColor Idatag_palette::get_feeder_colour(std::string& feeder)
+QColor Idatag_palette::get_feeder_colour(const std::string& feeder)
 {
 	return this->association[feeder];
 }

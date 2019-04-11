@@ -24,7 +24,7 @@ bool Idatag_proxy::filter_empty(int source_row, const QModelIndex& source_parent
 
 bool Idatag_proxy::filter_string(int source_row, const QModelIndex& source_parent) const
 {
-	if (filter_string_input == "") return true;
+	if (filter_string_input.isEmpty()) return true;
 
 	const Offset* offset = myModel->get_offset_byindex(source_row);
 	if (offset == NULL) return false;

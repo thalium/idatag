@@ -8,7 +8,10 @@
 
 #include "model.hpp"
 #include "view.hpp"
+#include "palette.hpp"
 
+#include <string>
+#include <sstream>
 
 class Idatag_delegate_rva : public QStyledItemDelegate 
 {
@@ -42,6 +45,7 @@ class Idatag_delegate_tag : public QStyledItemDelegate
 	Q_OBJECT
 private:
 	Idatag_model* myModel;
+	Idatag_palette* myPalette;
 	QT::QWidget* parent;
 	QTableView* myView;
 
@@ -60,14 +64,21 @@ private:
 	QT::QWidget* parent;
 	Idatag_model* myModel;
 	QTableView* myView;
+	Idatag_palette* myPalette;
 	QModelIndex index;
-	const Offset* offset;
+	Offset* offset;
 	QHBoxLayout* layout;
 
 public:
-	Idatag_wall(QT::QWidget*, Idatag_model* , QTableView*, const QModelIndex&, const Offset*);
-	void generate_tag(Tag);
+	Idatag_wall(QT::QWidget*, Idatag_model* , QTableView*, Idatag_palette*, const QModelIndex&, Offset*);
+	void generate_graph(Tag);
 	void clear_tags();
+	void mouseDoubleClickEvent(QMouseEvent*);
+
+public slots:
+	void edit_wall();
+signals:
+	void doubleClicked();
 };
 
 class Idatag_graph : public QPushButton
@@ -76,7 +87,47 @@ class Idatag_graph : public QPushButton
 private:
 	Idatag_wall* wall;
 	Tag tag;
+	QColor colour;
 
 public:
-	Idatag_graph(Idatag_wall*, Tag);
+	Idatag_graph(Idatag_wall*, Tag, QColor);
+	QString get_graph_style(QColor);
+	
+public slots:
+	void edit_graph();
+	void check_doubleClicked();
+signals :
+	void doubleClicked();
+};
+
+class Idatag_wallEditor : public QLineEdit
+{
+	Q_OBJECT
+private:
+	Idatag_wall* wall;
+	Idatag_model* myModel;
+	QTableView* myView;
+	QModelIndex index;
+	Offset* offset;
+public:
+	Idatag_wallEditor(Idatag_wall*, Idatag_model*, const QModelIndex&, QTableView*, Offset*);
+public slots:
+	void add_graph();
+};
+
+class Idatag_graphEditor : public QLineEdit
+{
+	Q_OBJECT
+private:
+	Idatag_graph* graph;
+	Idatag_model* myModel;
+	QTableView* myView;
+	QModelIndex index;
+	Offset* offset;
+	QString prev_tag;
+
+public:
+	Idatag_graphEditor(Idatag_graph*, Idatag_model*, const QModelIndex&, QTableView*, Offset*);
+public slots:
+	void replace_graph();
 };

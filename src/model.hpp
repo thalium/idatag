@@ -4,6 +4,7 @@
 #include <QtCore/qobject.h>
 
 #include <ida.hpp>
+#include <loader.hpp>
 #include <kernwin.hpp>
 #include <name.hpp>
 #include <funcs.hpp>
@@ -78,6 +79,7 @@ public:
 	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 	//bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 	//bool insertRows(int position, int rows, const QModelIndex $index = QModelIndex());
 	//bool removeRows(int position, int rows, const QModelIndex $index = QModelIndex());

@@ -28,7 +28,7 @@ void Idatag_model::print_stats_model()
 {
 	size_t nb_tags = count_stats_tags();
 	size_t nb_offsets = this->mydata.size();
-	msg("[IDATag] Tags : %d on %d offsets!", nb_tags, nb_offsets);
+	msg("\n[IDATag] Tags : %d on %d offsets!", nb_tags, nb_offsets);
 }
 
 const std::vector<Offset>& Idatag_model::get_data() const 
@@ -57,6 +57,27 @@ int Idatag_model::rowCount(const QModelIndex &parent) const
 int Idatag_model::columnCount(const QModelIndex &parent) const 
 {
 	return 3;
+}
+
+QVariant Idatag_model::headerData(int section, Qt::Orientation orientation, int role) const
+{
+	if (role != Qt::DisplayRole)
+		return QVariant();
+
+	if (orientation == Qt::Horizontal) {
+		switch (section) {
+		case 0:
+			return tr("Offset");
+		case 1:
+			return tr("Name");
+		case 2:
+			return tr("Tags");
+
+		default:
+			return QVariant();
+		}
+	}
+	return QVariant();
 }
 
 QVariant Idatag_model::data(const QModelIndex &index, int role) const
@@ -238,7 +259,7 @@ void Idatag_model::import_feeds(json& j_feeds)
 		}
 	}
 	catch (json::exception& e) {
-		msg("[IDATag] Error parsing file - %s\n", e.what());
+		msg("\n[IDATag] Error parsing file - %s", e.what());
 	}
 }
 
@@ -250,7 +271,7 @@ void Idatag_model::import_file(const fs::path& filepath)
 		import_feeds(j);
 	}
 	catch(std::ifstream::failure e){
-		msg("[IDATag] Error reading file - %s\n", e.what());
+		msg("\n[IDATag] Error reading file - %s", e.what());
 	}
 }
 
@@ -264,7 +285,7 @@ void Idatag_model::import_files(const fs::path& path_tags)
 	}
 	catch(fs::filesystem_error& e)
 	{
-		msg("[IDATag] Error reading directory - %s\n", e.what());
+		msg("\n[IDATag] Error reading directory - %s", e.what());
 	}
 }
 
@@ -281,13 +302,42 @@ void Idatag_model::import_tags()
 	}
 	catch (fs::filesystem_error& e)
 	{
-		msg("[IDATag] Error reading directory - %s\n", e.what());
+		msg("\n[IDATag] Error reading directory - %s", e.what());
 	}
 }
 
 void Idatag_model::export_tags() const
 {
-	msg("[IDATAG] Export not yet implemented");
+	try {
+		json jsonArray = json::array();
+		std::ofstream jsonFile;
+		for (const auto & offset : mydata)
+		{
+			std::vector<Tag> tags = offset.get_tags();
+			for (const auto & tag : tags)
+			{
+				json jsonTag;
+				
+				jsonTag["offset"] = offset.get_rva();
+				jsonTag["name"] = offset.get_name();
+				jsonTag["tag"] = tag.get_label();
+				jsonTag["feeder"] = tag.get_signature();
+				jsonTag["type"] = tag.get_type();
+
+				jsonArray.push_back(jsonTag);
+			}
+		}
+		fs::path file = fs::path(std::string(get_path(PATH_TYPE_IDB)) + ".json");
+
+		jsonFile.open(file);
+		jsonFile << jsonArray.dump().c_str();
+		jsonFile.close();
+		msg("\n[IDATag] Tags exported !");
+	}
+	catch (fs::filesystem_error& e)
+	{
+		msg("\n[IDATag] Error exporting tags - %s", e.what());
+	}
 }
 
 Offset::Offset()

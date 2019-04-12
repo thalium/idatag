@@ -2,7 +2,7 @@
 
 bool idaapi run(size_t)
 {
-	msg("IDATag v%s - %s - %s\r\n", version, authors, date);
+	msg("\nIDATag v%s - %s - %s", version, authors, date);
 	TWidget *ida_widget = find_widget(name);
 	if (ida_widget == NULL)
 	{
@@ -14,7 +14,7 @@ bool idaapi run(size_t)
 	}
 	else
 	{
-		msg("[IDATAG] Already loaded. Please close the tab first to run it again.\n");
+		msg("\n[IDATAG] Already loaded. Please close the tab first to run it again.");
 	}
 	
 	return true;

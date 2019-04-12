@@ -3,6 +3,7 @@
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QShortcut>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QGridLayout>
@@ -11,6 +12,9 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QPushButton>
 #include <QtCore/Qt>
+#include <QtGui/QContextMenuEvent>
+
+#include <ida.hpp>
 
 #include "model.hpp"
 #include "proxy.hpp"
@@ -37,4 +41,6 @@ public:
 
 	void OnFilter_empty();
 	void OnFilter_string();
+
+	void OnNavigate(const QModelIndex&);
 };

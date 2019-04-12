@@ -1,7 +1,7 @@
 #include "view.hpp"
 
-Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel) {
-
+Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel) 
+{
 	this->myModel = myModel;
 	this->parent = parent;
 
@@ -14,7 +14,10 @@ Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel) {
 	this->tb->setModel(myProxy);
 
 	this->tb->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	this->tb->resizeColumnsToContents();
+	this->tb->setColumnWidth(0, this->width()/5);
+	this->tb->setColumnWidth(1, this->width()/4);
+
+	this->tb->verticalHeader()->hide();
 
 	this->tb->setItemDelegateForColumn(0, new Idatag_delegate_rva(this->parent, this->myModel));
 	this->tb->setItemDelegateForColumn(1, new Idatag_delegate_name(this->parent, this->myModel));
@@ -41,10 +44,13 @@ Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel) {
 	this->layout->addWidget(this->tfl, 1, 0);
 	this->layout->addWidget(this->tf, 1, 1);
 	this->layout->addWidget(this->cbox, 1, 2);
+
+	connect(this->tb, &QTableView::clicked, this, &Idatag_view::OnNavigate);
 }
 
-Idatag_view::~Idatag_view() {}
-
+Idatag_view::~Idatag_view() 
+{
+}
 
 void Idatag_view::OnFilter_string()
 {
@@ -72,4 +78,16 @@ void Idatag_view::OnFilter_empty()
 		this->cbox->setCheckState(Qt::Unchecked);
 	}
 	this->myProxy->invalidateFilter();
+}
+
+void Idatag_view::OnNavigate(const QModelIndex& index)
+{
+	if (index.column() == 0 || index.column() == 1) 
+	{
+		QModelIndex index_sibling = index.sibling(index.row(), 2);
+		Offset* offset = index_sibling.data().value<Offset*>();
+		if (offset->get_rva() == 0) return;
+
+		jumpto(offset->get_rva());
+	}
 }

@@ -4,7 +4,10 @@
 Idatag_delegate_rva::Idatag_delegate_rva(QT::QWidget* parent, Idatag_model* myModel) :
 	QStyledItemDelegate()
 {
+	this->parent = parent;
+	this->myModel = myModel;
 }
+
 Idatag_delegate_rva::~Idatag_delegate_rva() {}
 
 void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const 
@@ -16,7 +19,7 @@ void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& o
 	{
 		uint64_t rva = qvariant_cast<uint64_t>(index.data());
 		snprintf(rva_str, 19, "0x%016llX", rva);
-		painter->drawText(option.rect, Qt::AlignVCenter | Qt::AlignLeft, rva_str);
+		painter->drawText(option.rect, Qt::AlignVCenter, rva_str);
 	}
 	else {
 		QStyledItemDelegate::paint(painter, option, index);
@@ -77,7 +80,6 @@ QT::QWidget* Idatag_delegate_tag::createEditor(QWidget* parent, const QStyleOpti
 	Idatag_wall* wall = new Idatag_wall(parent, this->myModel,this->myView, this->myPalette, index, offset);
 	wall->clear_tags();
 	for (auto &tag : tags) {
-		msg("\nCreate : %s", tag.get_label());
 		wall->generate_graph(tag);
 	}
 	return wall;
@@ -98,8 +100,72 @@ Idatag_wall::Idatag_wall(QT::QWidget* parent, Idatag_model* myModel, QTableView*
 	this->layout->setContentsMargins(11, 5, 11, 11);
 	this->layout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	this->setLayout(layout);
-	
+
+	installEventFilter(this);
+	createActions();
 	connect(this, &Idatag_wall::doubleClicked, this, &Idatag_wall::edit_wall);
+}
+
+void Idatag_wall::createActions()
+{
+	this->export_tag = new QAction(tr("&Export tags"), this);
+	this->export_tag->setShortcuts(QKeySequence::SaveAs);
+	this->export_tag->setStatusTip(tr("Export tags to file"));
+	connect(this->export_tag, &QAction::triggered, this, &Idatag_wall::OnAction_export_tag);
+
+	this->import_tag = new QAction(tr("&Import tags"), this);
+	this->import_tag->setShortcuts(QKeySequence::Open);
+	this->import_tag->setStatusTip(tr("Import tags from file"));
+	connect(this->import_tag, &QAction::triggered, this, &Idatag_wall::OnAction_import_tag);
+
+	this->filter_feeder = new QAction(tr("&Filter by signature"), this);
+	this->filter_feeder->setShortcuts(QKeySequence::Preferences);
+	this->filter_feeder->setStatusTip(tr("Filter tags by signature"));
+	connect(this->filter_feeder, &QAction::triggered, this, &Idatag_wall::OnAction_filter_feeder);
+
+	this->paint_tag = new QAction(tr("&Paint offsets"), this);
+	this->paint_tag->setShortcuts(QKeySequence::Refresh);
+	this->paint_tag->setStatusTip(tr("Paint offsets in code"));
+	connect(this->paint_tag, &QAction::triggered, this, &Idatag_wall::OnAction_paint_tag);
+
+	this->contextual_menu = new QMenu();
+	this->contextual_menu->addAction(this->export_tag);
+	this->contextual_menu->addAction(this->import_tag);
+	this->contextual_menu->addAction(this->filter_feeder);
+	this->contextual_menu->addAction(this->paint_tag);
+}
+
+void Idatag_wall::OnAction_export_tag()
+{
+	this->myModel->export_tags();
+}
+
+void Idatag_wall::OnAction_import_tag()
+{
+	this->myModel->import_tags();
+}
+
+void Idatag_wall::OnAction_filter_feeder()
+{
+	msg("\nFilter");
+}
+
+void Idatag_wall::OnAction_paint_tag()
+{
+	msg("\nPaint");
+}
+
+bool Idatag_wall::eventFilter(QObject *obj, QEvent *event)
+{
+	if (event->type() == QEvent::ContextMenu)
+	{
+		QPoint pos = QCursor::pos();
+		contextual_menu->exec(pos);
+		return true;
+	}
+	else {
+		return QListWidget::eventFilter(obj, event);
+	}
 }
 
 void Idatag_wall::edit_wall()
@@ -210,16 +276,31 @@ Idatag_wallEditor::Idatag_wallEditor(Idatag_wall* wall, Idatag_model* myModel, c
 	connect(this, &QLineEdit::returnPressed, this, &Idatag_wallEditor::add_graph);
 }
 
+void Idatag_wallEditor::keyPressEvent(QKeyEvent *event)
+{
+	if (event->key() == Qt::Key_Escape)
+	{
+		this->add_graph();
+	}
+	QLineEdit::keyPressEvent(event);
+}
+
 void Idatag_wallEditor::add_graph()
 {
-	QStringList labels = this->text().split(" ");
-	for (const auto & qlabel : labels)
+	QString qinput = this->text();
+	std::string input = qinput.toStdString();
+	if (input.find_first_not_of(" ") != std::string::npos)
 	{
-		std::string feeder = "IDA";
-		std::string label = qlabel.toStdString();
-		Tag tag = Tag(label, feeder);
-		this->offset->add_tag(tag);
-		this->myModel->add_feeder(feeder);
+		QStringList labels = this->text().split(" ");
+		for (const auto & qlabel : labels)
+		{
+			std::string feeder = "IDA";
+			std::string label = qlabel.toStdString();
+			Tag tag = Tag(label, feeder);
+			this->offset->add_tag(tag);
+			this->myModel->add_feeder(feeder);
+		}
+
 	}
 	this->close();
 	this->myView->closePersistentEditor(this->index);
@@ -243,11 +324,24 @@ Idatag_graphEditor::Idatag_graphEditor(Idatag_graph* graph, Idatag_model* myMode
 	connect(this, &QLineEdit::returnPressed, this, &Idatag_graphEditor::replace_graph);
 }
 
+void Idatag_graphEditor::keyPressEvent(QKeyEvent *event)
+{
+	if (event->key() == Qt::Key_Escape)
+	{
+		this->replace_graph();
+	}
+	QLineEdit::keyPressEvent(event);
+}
+
 void Idatag_graphEditor::replace_graph()
 {
 	std::string tag_del = prev_tag.toStdString();
 	this->offset->remove_tag(tag_del);
-	if (!this->text().isEmpty()) {
+
+	QString qinput = this->text();
+	std::string input = qinput.toStdString();
+
+	if (!this->text().isEmpty() && input.find_first_not_of(" ") != std::string::npos) {
 		QStringList labels = this->text().split(" ");
 		for (const auto & qlabel : labels)
 		{

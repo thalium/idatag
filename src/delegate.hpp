@@ -69,11 +69,27 @@ private:
 	Offset* offset;
 	QHBoxLayout* layout;
 
+	QMenu* contextual_menu;
+	QAction* export_tag;
+	QAction* import_tag;
+	QAction* filter_feeder;
+	QAction* paint_tag;
+
+	void createActions();
+
+private slots:
+	void OnAction_export_tag();
+	void OnAction_import_tag();
+	void OnAction_filter_feeder();
+	void OnAction_paint_tag();
+
 public:
 	Idatag_wall(QT::QWidget*, Idatag_model* , QTableView*, Idatag_palette*, const QModelIndex&, Offset*);
 	void generate_graph(Tag);
 	void clear_tags();
 	void mouseDoubleClickEvent(QMouseEvent*);
+
+	bool eventFilter(QObject *, QEvent *);
 
 public slots:
 	void edit_wall();
@@ -115,6 +131,7 @@ private:
 	Offset* offset;
 public:
 	Idatag_wallEditor(Idatag_wall*, Idatag_model*, const QModelIndex&, QTableView*, Offset*);
+	void keyPressEvent(QKeyEvent *event);
 public slots:
 	void add_graph();
 };
@@ -132,6 +149,7 @@ private:
 
 public:
 	Idatag_graphEditor(Idatag_graph*, Idatag_model*, const QModelIndex&, QTableView*, Offset*);
+	void keyPressEvent(QKeyEvent *event);
 public slots:
 	void replace_graph();
 };

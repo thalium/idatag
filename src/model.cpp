@@ -8,6 +8,12 @@ bool check_rva(uint64_t rva)
 	return is_mapped(rva);
 }
 
+Idatag_model::Idatag_model(Idatag_configuration* configuration)
+{
+	this->myConfiguration = configuration;
+}
+
+
 void Idatag_model::init_model() 
 {
 	import_info_disas();
@@ -187,7 +193,8 @@ void Idatag_model::remove_offset(const uint64_t& rva) FIXME
 */
 void Idatag_model::add_feeder(std::string& feeder) 
 {
-	this->myfeeders.push_back(feeder);
+	auto it = std::find(this->myfeeders.begin(), this->myfeeders.end(), feeder);
+	if (it == this->myfeeders.end()) this->myfeeders.push_back(feeder);
 }
 
 void Idatag_model::remove_feeder(std::string& feeder) 
@@ -241,6 +248,7 @@ void Idatag_model::import_feed(const json& j_feed, Offset& offset)
 
 	Tag tag = Tag(label, feeder);
 	offset.add_tag(tag);
+	add_feeder(feeder);
 }
 
 void Idatag_model::import_feeds(json& j_feeds)
@@ -311,6 +319,7 @@ void Idatag_model::export_tags() const
 	try {
 		json jsonArray = json::array();
 		std::ofstream jsonFile;
+		fs::path file;
 		for (const auto & offset : mydata)
 		{
 			std::vector<Tag> tags = offset.get_tags();
@@ -327,8 +336,13 @@ void Idatag_model::export_tags() const
 				jsonArray.push_back(jsonTag);
 			}
 		}
-		fs::path file = fs::path(std::string(get_path(PATH_TYPE_IDB)) + ".json");
-
+		if (this->myConfiguration->get_path_configuration().empty())
+		{
+			file = fs::path(std::string(get_path(PATH_TYPE_IDB)) + ".json");
+		}
+		else {
+			file = fs::path(this->myConfiguration->get_path_configuration() + ".json");
+		}
 		jsonFile.open(file);
 		jsonFile << jsonArray.dump().c_str();
 		jsonFile.close();

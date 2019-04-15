@@ -1,5 +1,7 @@
 #include "idatag.hpp"
 
+Idatag_configuration* myConfiguration;
+
 bool idaapi run(size_t)
 {
 	msg("\nIDATag v%s - %s - %s", version, authors, date);
@@ -7,9 +9,14 @@ bool idaapi run(size_t)
 	if (ida_widget == NULL)
 	{
 		ida_widget = create_empty_widget(name);
-		Idatag_model* myModel = new Idatag_model();
+		if (myConfiguration == NULL) return false;
+
+		Idatag_model* myModel = new Idatag_model(myConfiguration);
+		if (myModel == NULL) return false;
 		myModel->init_model();
-		Idatag_view* myView = new Idatag_view((QT::QWidget *)ida_widget, myModel);
+
+		Idatag_view* myView = new Idatag_view((QT::QWidget *)ida_widget, myModel, myConfiguration);
+		if (myView == NULL) return false;
 		display_widget(ida_widget, WOPN_TAB);
 	}
 	else
@@ -22,11 +29,16 @@ bool idaapi run(size_t)
 
 int idaapi init(void)
 {
+	if (!is_idaq())
+		return PLUGIN_SKIP;
+
+	myConfiguration = new Idatag_configuration();
 	return PLUGIN_KEEP;
 }
 
 void idaapi term(void)
 {
+	myConfiguration->uninstall_menu_configuration();
 	TWidget *ida_widget = find_widget(name);
 	close_widget(ida_widget, WCLS_SAVE);
 }

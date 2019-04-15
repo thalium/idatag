@@ -11,6 +11,7 @@
 #include <bytes.hpp>
 
 #include "json.hpp"
+#include "configuration.hpp"
 
 #include <string>
 #include <vector>
@@ -67,8 +68,10 @@ class Idatag_model : public QT::QAbstractTableModel {
 private:
 	std::vector<Offset>			mydata;
 	std::vector<std::string>	myfeeders;
+	Idatag_configuration*		myConfiguration;
 
 public:
+	Idatag_model(Idatag_configuration*);
 	void init_model();
 	const int count_stats_tags() const;
 	void print_stats_model();

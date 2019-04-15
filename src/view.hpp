@@ -19,12 +19,14 @@
 #include "model.hpp"
 #include "proxy.hpp"
 #include "delegate.hpp"
+#include "configuration.hpp"
 
 class Idatag_view : public QT::QWidget{
 	Q_OBJECT
 private:
 	Idatag_model*		myModel;
 	Idatag_proxy*		myProxy;
+	Idatag_configuration* myConfiguration;
 	QWidget*			parent;
 	QTableView*			tb;
 	QHeaderView*		hheader;
@@ -36,7 +38,7 @@ private:
 	QGridLayout*		layout;
 
 public:
-	Idatag_view(QT::QWidget*, Idatag_model*);
+	Idatag_view(QT::QWidget*, Idatag_model*, Idatag_configuration*);
 	~Idatag_view();
 
 	void OnFilter_empty();

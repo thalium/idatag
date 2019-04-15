@@ -4,6 +4,7 @@
 #include <QtCore/Qt>
 
 #include "model.hpp"
+#include "configuration.hpp"
 
 class Idatag_proxy : public QT::QSortFilterProxyModel {
 	Q_OBJECT

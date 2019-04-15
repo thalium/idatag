@@ -19,9 +19,10 @@ class Idatag_delegate_rva : public QStyledItemDelegate
 private:
 	Idatag_model* myModel;
 	QT::QWidget* parent;
+	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_delegate_rva(QT::QWidget*, Idatag_model*);
+	Idatag_delegate_rva(QT::QWidget*, Idatag_model*, Idatag_configuration*);
 	~Idatag_delegate_rva();
 	void paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
@@ -33,9 +34,10 @@ class Idatag_delegate_name : public QStyledItemDelegate
 private:
 	Idatag_model* myModel;
 	QT::QWidget* parent;
+	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_delegate_name(QT::QWidget*, Idatag_model*);
+	Idatag_delegate_name(QT::QWidget*, Idatag_model*, Idatag_configuration*);
 	~Idatag_delegate_name();
 	void paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
@@ -48,9 +50,10 @@ private:
 	Idatag_palette* myPalette;
 	QT::QWidget* parent;
 	QTableView* myView;
+	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_delegate_tag(QT::QWidget*, Idatag_model*, QT::QTableView*);
+	Idatag_delegate_tag(QT::QWidget*, Idatag_model*, QT::QTableView*, Idatag_configuration*);
 	~Idatag_delegate_tag();
 	void paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	QT::QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
@@ -68,6 +71,7 @@ private:
 	QModelIndex index;
 	Offset* offset;
 	QHBoxLayout* layout;
+	Idatag_configuration* myConfiguration;
 
 	QMenu* contextual_menu;
 	QAction* export_tag;
@@ -84,7 +88,7 @@ private slots:
 	void OnAction_paint_tag();
 
 public:
-	Idatag_wall(QT::QWidget*, Idatag_model* , QTableView*, Idatag_palette*, const QModelIndex&, Offset*);
+	Idatag_wall(QT::QWidget*, Idatag_model* , QTableView*, Idatag_palette*, const QModelIndex&, Offset*, Idatag_configuration*);
 	void generate_graph(Tag);
 	void clear_tags();
 	void mouseDoubleClickEvent(QMouseEvent*);
@@ -108,9 +112,10 @@ private:
 	QModelIndex index;
 	Tag tag;
 	QColor colour;
+	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_graph(Idatag_wall*, Idatag_model*, QTableView*, Offset*, const QModelIndex&, Tag, QColor);
+	Idatag_graph(Idatag_wall*, Idatag_model*, QTableView*, Offset*, const QModelIndex&, Tag, QColor, Idatag_configuration*);
 	QString get_graph_style(QColor);
 	void mouseDoubleClickEvent(QMouseEvent*);
 	
@@ -129,8 +134,10 @@ private:
 	QTableView* myView;
 	QModelIndex index;
 	Offset* offset;
+	Idatag_configuration* myConfiguration;
+
 public:
-	Idatag_wallEditor(Idatag_wall*, Idatag_model*, const QModelIndex&, QTableView*, Offset*);
+	Idatag_wallEditor(Idatag_wall*, Idatag_model*, const QModelIndex&, QTableView*, Offset*, Idatag_configuration*);
 	void keyPressEvent(QKeyEvent *event);
 public slots:
 	void add_graph();
@@ -146,9 +153,10 @@ private:
 	QModelIndex index;
 	Offset* offset;
 	QString prev_tag;
+	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_graphEditor(Idatag_graph*, Idatag_model*, const QModelIndex&, QTableView*, Offset*);
+	Idatag_graphEditor(Idatag_graph*, Idatag_model*, const QModelIndex&, QTableView*, Offset*, Idatag_configuration*);
 	void keyPressEvent(QKeyEvent *event);
 public slots:
 	void replace_graph();

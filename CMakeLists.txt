@@ -45,6 +45,8 @@ add_library(${PROJECT_NAME}  SHARED
 	src/delegate.cpp
 	src/palette.hpp
 	src/palette.cpp
+	src/configuration.cpp
+	src/configuration.hpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

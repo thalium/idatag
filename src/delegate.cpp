@@ -1,11 +1,12 @@
 #include "delegate.hpp"
 
 
-Idatag_delegate_rva::Idatag_delegate_rva(QT::QWidget* parent, Idatag_model* myModel) :
+Idatag_delegate_rva::Idatag_delegate_rva(QT::QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration) :
 	QStyledItemDelegate()
 {
 	this->parent = parent;
 	this->myModel = myModel;
+	this->myConfiguration = myConfiguration;
 }
 
 Idatag_delegate_rva::~Idatag_delegate_rva() {}
@@ -18,7 +19,14 @@ void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& o
 	if (index.data().canConvert<uint64_t>())
 	{
 		uint64_t rva = qvariant_cast<uint64_t>(index.data());
-		snprintf(rva_str, 19, "0x%016llX", rva);
+		if (this->myConfiguration->get_address_width_configuration() == 16)
+		{
+			snprintf(rva_str, 19, "0x%016llX", rva);
+		}
+		else
+		{
+			snprintf(rva_str, 19, "0x%08llX", rva);
+		}
 		painter->drawText(option.rect, Qt::AlignVCenter, rva_str);
 	}
 	else {
@@ -26,11 +34,12 @@ void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& o
 	}
 }
 
-Idatag_delegate_name::Idatag_delegate_name(QT::QWidget* parent, Idatag_model* myModel) :
+Idatag_delegate_name::Idatag_delegate_name(QT::QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration) :
 	QStyledItemDelegate()
 {
 	this->parent = parent;
 	this->myModel = myModel;
+	this->myConfiguration = myConfiguration;
 }
 
 Idatag_delegate_name::~Idatag_delegate_name() {}
@@ -49,13 +58,14 @@ void Idatag_delegate_name::paint(QPainter *painter, const QStyleOptionViewItem& 
 }
 
 
-Idatag_delegate_tag::Idatag_delegate_tag(QT::QWidget* parent, Idatag_model* myModel, QT::QTableView* myView) :
+Idatag_delegate_tag::Idatag_delegate_tag(QT::QWidget* parent, Idatag_model* myModel, QT::QTableView* myView, Idatag_configuration* myConfiguration) :
 	QStyledItemDelegate()
 {
 	this->parent = parent;
 	this->myModel = myModel;
 	this->myView = myView;
 	this->myPalette = new Idatag_palette(this->myModel->get_feeders());
+	this->myConfiguration = myConfiguration;
 }
 
 Idatag_delegate_tag::~Idatag_delegate_tag() {}
@@ -77,7 +87,7 @@ QT::QWidget* Idatag_delegate_tag::createEditor(QWidget* parent, const QStyleOpti
 {
 	Offset* offset = index.data().value<Offset*>();
 	std::vector<Tag> tags = offset->get_tags();
-	Idatag_wall* wall = new Idatag_wall(parent, this->myModel,this->myView, this->myPalette, index, offset);
+	Idatag_wall* wall = new Idatag_wall(parent, this->myModel,this->myView, this->myPalette, index, offset, this->myConfiguration);
 	wall->clear_tags();
 	for (auto &tag : tags) {
 		wall->generate_graph(tag);
@@ -85,7 +95,7 @@ QT::QWidget* Idatag_delegate_tag::createEditor(QWidget* parent, const QStyleOpti
 	return wall;
 }
 
-Idatag_wall::Idatag_wall(QT::QWidget* parent, Idatag_model* myModel, QTableView* myView, Idatag_palette* myPalette, const QModelIndex& index, Offset* offset) :
+Idatag_wall::Idatag_wall(QT::QWidget* parent, Idatag_model* myModel, QTableView* myView, Idatag_palette* myPalette, const QModelIndex& index, Offset* offset, Idatag_configuration* myConfiguration) :
 	QListWidget(parent)
 {
 	this->parent = parent;
@@ -94,6 +104,7 @@ Idatag_wall::Idatag_wall(QT::QWidget* parent, Idatag_model* myModel, QTableView*
 	this->myPalette = myPalette;
 	this->index = index;
 	this->offset = offset;
+	this->myConfiguration = myConfiguration;
 
 	this->setStyleSheet("border: 0px;");
 	this->layout = new QHBoxLayout();
@@ -170,7 +181,7 @@ bool Idatag_wall::eventFilter(QObject *obj, QEvent *event)
 
 void Idatag_wall::edit_wall()
 {
-	Idatag_wallEditor* wallEditor = new Idatag_wallEditor(this, this->myModel, this->index, this->myView, this->offset);
+	Idatag_wallEditor* wallEditor = new Idatag_wallEditor(this, this->myModel, this->index, this->myView, this->offset, this->myConfiguration);
 	wallEditor->show();
 	wallEditor->setFocus();
 }
@@ -191,7 +202,7 @@ void Idatag_wall::clear_tags()
 void Idatag_wall::generate_graph(Tag tag)
 {
 	QColor colour = this->myPalette->get_feeder_colour(tag.get_signature());
-	Idatag_graph* graph = new Idatag_graph(this, this->myModel, this->myView, this->offset, this->index, tag, colour);
+	Idatag_graph* graph = new Idatag_graph(this, this->myModel, this->myView, this->offset, this->index, tag, colour, this->myConfiguration);
 	this->layout->addWidget(graph);
 }
 
@@ -219,7 +230,7 @@ QString Idatag_graph::get_graph_style(QColor colour)
 	return style;
 }
 
-Idatag_graph::Idatag_graph(Idatag_wall* wall, Idatag_model* myModel, QTableView* myView, Offset* offset, const QModelIndex& index, Tag tag, QColor colour) :
+Idatag_graph::Idatag_graph(Idatag_wall* wall, Idatag_model* myModel, QTableView* myView, Offset* offset, const QModelIndex& index, Tag tag, QColor colour, Idatag_configuration* myConfiguration) :
 	QPushButton(wall)
 {
 	this->wall = wall;
@@ -229,6 +240,7 @@ Idatag_graph::Idatag_graph(Idatag_wall* wall, Idatag_model* myModel, QTableView*
 	this->index = index;
 	this->tag = tag;
 	this->colour = colour;
+	this->myConfiguration = myConfiguration;
 
 	std::string label = this->tag.get_label();
 	QString qlabel = QString::fromStdString(label);
@@ -251,7 +263,7 @@ Idatag_graph::Idatag_graph(Idatag_wall* wall, Idatag_model* myModel, QTableView*
 
 void Idatag_graph::edit_graph()
 {
-	Idatag_graphEditor* graphEditor = new Idatag_graphEditor(this, this->myModel, this->index, this->myView, this->offset);
+	Idatag_graphEditor* graphEditor = new Idatag_graphEditor(this, this->myModel, this->index, this->myView, this->offset, this->myConfiguration);
 	graphEditor->show();
 	graphEditor->setFocus();
 }
@@ -261,7 +273,7 @@ void Idatag_graph::mouseDoubleClickEvent(QMouseEvent *event)
 	emit doubleClicked();
 }
 
-Idatag_wallEditor::Idatag_wallEditor(Idatag_wall* wall, Idatag_model* myModel, const QModelIndex& index, QTableView* myView, Offset* offset) :
+Idatag_wallEditor::Idatag_wallEditor(Idatag_wall* wall, Idatag_model* myModel, const QModelIndex& index, QTableView* myView, Offset* offset, Idatag_configuration* myConfiguration) :
 	QLineEdit(wall)
 {
 	this->wall = wall;
@@ -269,6 +281,7 @@ Idatag_wallEditor::Idatag_wallEditor(Idatag_wall* wall, Idatag_model* myModel, c
 	this->index = index;
 	this->myView = myView;
 	this->offset = offset;
+	this->myConfiguration = myConfiguration;
 
 	this->setMinimumWidth(wall->width());
 	this->selectAll();
@@ -294,11 +307,19 @@ void Idatag_wallEditor::add_graph()
 		QStringList labels = this->text().split(" ");
 		for (const auto & qlabel : labels)
 		{
-			std::string feeder = "IDA";
+			std::string user = this->myConfiguration->get_username_configuration();
+			std::string feeder = user;
+
 			std::string label = qlabel.toStdString();
 			Tag tag = Tag(label, feeder);
 			this->offset->add_tag(tag);
+
+			std::string autofeed = "IDATag";
+			Tag tag_user = Tag(this->myConfiguration->get_username_configuration(), autofeed);
+			this->offset->add_tag(tag_user);
+
 			this->myModel->add_feeder(feeder);
+			this->myModel->add_feeder(autofeed);
 		}
 
 	}
@@ -307,7 +328,7 @@ void Idatag_wallEditor::add_graph()
 	this->parentWidget()->deleteLater();
 }
 
-Idatag_graphEditor::Idatag_graphEditor(Idatag_graph* graph, Idatag_model* myModel, const QModelIndex& index, QTableView* myView, Offset* offset) :
+Idatag_graphEditor::Idatag_graphEditor(Idatag_graph* graph, Idatag_model* myModel, const QModelIndex& index, QTableView* myView, Offset* offset, Idatag_configuration* myConfiguration) :
 	QLineEdit(graph->parentWidget())
 {
 	this->graph = graph;
@@ -315,6 +336,7 @@ Idatag_graphEditor::Idatag_graphEditor(Idatag_graph* graph, Idatag_model* myMode
 	this->myView = myView;
 	this->index = index;
 	this->offset = offset;
+	this->myConfiguration = myConfiguration;
 
 	this->prev_tag = this->graph->text();
 	this->setText(this->prev_tag);
@@ -345,11 +367,19 @@ void Idatag_graphEditor::replace_graph()
 		QStringList labels = this->text().split(" ");
 		for (const auto & qlabel : labels)
 		{
-			std::string feeder = "IDA";
+			std::string user = this->myConfiguration->get_username_configuration();
+			std::string feeder = user;
+
 			std::string label = qlabel.toStdString();
 			Tag tag = Tag(label, feeder);
 			this->offset->add_tag(tag);
+
+			std::string autofeed = "IDATag";
+			Tag tag_user = Tag(this->myConfiguration->get_username_configuration(), autofeed);
+			this->offset->add_tag(tag_user);
+
 			this->myModel->add_feeder(feeder);
+			this->myModel->add_feeder(autofeed);
 		}
 	}
 	this->close();

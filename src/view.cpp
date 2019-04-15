@@ -1,9 +1,10 @@
 #include "view.hpp"
 
-Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel) 
+Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration)
 {
 	this->myModel = myModel;
 	this->parent = parent;
+	this->myConfiguration = myConfiguration;
 
 	this->tb = new QTableView();
 	this->tb->setSortingEnabled(true);
@@ -19,9 +20,9 @@ Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel)
 
 	this->tb->verticalHeader()->hide();
 
-	this->tb->setItemDelegateForColumn(0, new Idatag_delegate_rva(this->parent, this->myModel));
-	this->tb->setItemDelegateForColumn(1, new Idatag_delegate_name(this->parent, this->myModel));
-	this->tb->setItemDelegateForColumn(2, new Idatag_delegate_tag(this->parent, this->myModel, this->tb));
+	this->tb->setItemDelegateForColumn(0, new Idatag_delegate_rva(this->parent, this->myModel, this->myConfiguration));
+	this->tb->setItemDelegateForColumn(1, new Idatag_delegate_name(this->parent, this->myModel, this->myConfiguration));
+	this->tb->setItemDelegateForColumn(2, new Idatag_delegate_tag(this->parent, this->myModel, this->tb, this->myConfiguration));
 
 	this->hheader = this->tb->horizontalHeader();
 	this->hheader->setSectionsMovable(true);

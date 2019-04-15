@@ -33,7 +33,6 @@ private:
 	QCheckBox*			cbox;
 	QLineEdit*			tf;
 	QLabel*				tfl;
-	QKeySequence*		sc_filter_sequence;
 	QShortcut*			sc_filter;
 	QGridLayout*		layout;
 
@@ -45,4 +44,5 @@ public:
 	void OnFilter_string();
 
 	void OnNavigate(const QModelIndex&);
+	void OnSearch();
 };

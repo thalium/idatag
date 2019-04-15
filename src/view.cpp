@@ -40,6 +40,9 @@ Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel, Idatag_conf
 	this->tfl->setText("Search: ");
 	connect(this->tf, &QLineEdit::textChanged, this, &Idatag_view::OnFilter_string);
 
+	this->sc_filter = new QShortcut(QKeySequence("Ctrl+f"), this->parent);
+	connect(this->sc_filter, &QShortcut::activated, this, &Idatag_view::OnSearch);
+
 	this->layout = new QGridLayout(parent);
 	this->layout->addWidget(this->tb, 0, 0, 1, 0);
 	this->layout->addWidget(this->tfl, 1, 0);
@@ -91,4 +94,10 @@ void Idatag_view::OnNavigate(const QModelIndex& index)
 
 		jumpto(offset->get_rva());
 	}
+}
+
+void Idatag_view::OnSearch()
+{
+	this->tf->setFocus();
+	this->tf->selectAll();
 }

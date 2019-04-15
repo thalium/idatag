@@ -15,6 +15,7 @@ bool idaapi run(size_t)
 		if (myModel == NULL) return false;
 		myModel->init_model();
 
+		Idatag_hook_idb* myHook_IDB = new Idatag_hook_idb(myModel);
 		Idatag_view* myView = new Idatag_view((QT::QWidget *)ida_widget, myModel, myConfiguration);
 		if (myView == NULL) return false;
 		display_widget(ida_widget, WOPN_TAB);

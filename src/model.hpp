@@ -51,6 +51,7 @@ public:
 
 	const uint64_t get_rva() const ;
 	const std::string get_name() const;
+	void set_name(std::string);
 
 	bool check_already_tagged(std::string&) const;
 	bool compare_tag_label(const std::string&, Tag&) const;

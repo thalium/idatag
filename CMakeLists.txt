@@ -47,6 +47,8 @@ add_library(${PROJECT_NAME}  SHARED
 	src/palette.cpp
 	src/configuration.cpp
 	src/configuration.hpp
+	src/hooks_disas.cpp
+	src/hooks_disas.hpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

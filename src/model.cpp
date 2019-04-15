@@ -427,6 +427,11 @@ const std::string Offset::get_name() const
 	return this->name;
 }
 
+void Offset::set_name(std::string name)
+{
+	this->name = name;
+}
+
 Tag::Tag(std::string& label, std::string& signature)
 {
 	this->label = label;

@@ -8,6 +8,7 @@
 #include "model.hpp"
 #include "view.hpp"
 #include "configuration.hpp"
+#include "hooks_disas.hpp"
 
 constexpr const char * version = "0.0.1";
 constexpr const char* authors = "Arnaud Gatignol @ Thales";

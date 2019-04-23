@@ -1,6 +1,6 @@
 #include "view.hpp"
 
-Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration)
+Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration)
 {
 	this->myModel = myModel;
 	this->parent = parent;
@@ -22,7 +22,7 @@ Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel, Idatag_conf
 
 	this->tb->setItemDelegateForColumn(0, new Idatag_delegate_rva(this->parent, this->myModel, this->myConfiguration));
 	this->tb->setItemDelegateForColumn(1, new Idatag_delegate_name(this->parent, this->myModel, this->myConfiguration));
-	this->tb->setItemDelegateForColumn(2, new Idatag_delegate_tag(this->parent, this->myModel, this->tb, this->myConfiguration));
+	this->tb->setItemDelegateForColumn(2, new Idatag_delegate_tag(this->parent, this->myModel, this, this->myConfiguration));
 
 	this->hheader = this->tb->horizontalHeader();
 	this->hheader->setSectionsMovable(true);
@@ -50,10 +50,97 @@ Idatag_view::Idatag_view(QT::QWidget* parent, Idatag_model* myModel, Idatag_conf
 	this->layout->addWidget(this->cbox, 1, 2);
 
 	connect(this->tb, &QTableView::clicked, this, &Idatag_view::OnNavigate);
+
+	this->wnd_filter_feeder = new QWidget();
+	this->feeder_filter_layout = new QGridLayout(wnd_filter_feeder);
+	this->feeder_layout = new QVBoxLayout();
+	wnd_filter_feeder->setWindowTitle("IDATag] Filter by feeders...");
+	this->btn_filter_feeder_ok = new QPushButton("OK");
+	this->btn_filter_feeder_cancel = new QPushButton("Cancel");
+
+	this->feeder_filter_layout->addLayout(feeder_layout, 0, 0, 0);
+	this->feeder_filter_layout->addWidget(this->btn_filter_feeder_ok, this->myModel->get_feeders().size() + 3, 0);
+	this->feeder_filter_layout->addWidget(this->btn_filter_feeder_cancel, this->myModel->get_feeders().size() + 3, 1);
+
+	connect(this->btn_filter_feeder_ok, &QPushButton::clicked, this, &Idatag_view::OnFilter_feeder);
+	connect(this->btn_filter_feeder_cancel, &QPushButton::clicked, this, &Idatag_view::OnFilter_feeder_pass);
 }
 
 Idatag_view::~Idatag_view() 
 {
+	delete this->btn_filter_feeder_cancel;
+	delete this->btn_filter_feeder_ok;
+	delete this->feeder_layout;
+	delete this->feeder_filter_layout;
+	delete this->wnd_filter_feeder;
+	delete this->layout;
+	delete this->sc_filter;
+	delete this->tfl;
+	delete this->tf;
+	delete this->cbox;
+	delete this->hheader;
+	delete this->tb;
+}
+
+QTableView* Idatag_view::get_Tb()
+{
+	return this->tb;
+}
+
+void Idatag_view::OnFilter_feeder_update()
+{
+	if (this->feeder_layout == NULL) return;
+
+	if (this->feeder_layout->count() > 0)
+	{
+		while (auto cbox = this->feeder_layout->takeAt(0))
+		{
+			delete cbox->widget();
+		}
+	}
+
+	for (const auto & feeder : this->myModel->get_feeders())
+	{
+		QString qfeeder = QString::fromStdString(feeder);
+		QCheckBox* cbox = new QCheckBox(qfeeder);
+		if (this->myProxy->is_feeder_filtered(feeder))
+		{
+			cbox->setCheckState(Qt::Unchecked);
+		}
+		else {
+			cbox->setCheckState(Qt::Checked);
+		}
+		this->feeder_layout->addWidget(cbox);
+	}
+}
+
+void Idatag_view::OnFilter_feeder_show()
+{
+	this->wnd_filter_feeder->show();
+}
+
+void Idatag_view::OnFilter_feeder()
+{
+	std::vector<std::string> feeders_filtered;
+	for (int i = 0; i < this->feeder_layout->count(); ++i)
+	{
+		QCheckBox *cbox = (QCheckBox *)this->feeder_layout->itemAt(i)->widget();
+		if (cbox != NULL)
+		{
+			if (cbox->checkState() == Qt::Unchecked)
+			{
+				feeders_filtered.push_back(cbox->text().toStdString());
+			}
+		}
+	}
+	this->myProxy->set_filter_feeder(feeders_filtered);
+	this->myProxy->invalidateFilter();
+	this->wnd_filter_feeder->close();
+}
+
+void Idatag_view::OnFilter_feeder_pass()
+{
+	this->wnd_filter_feeder->close();
 }
 
 void Idatag_view::OnFilter_string()

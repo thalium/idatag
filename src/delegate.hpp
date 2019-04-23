@@ -18,12 +18,11 @@ class Idatag_delegate_rva : public QStyledItemDelegate
 	Q_OBJECT
 private:
 	Idatag_model* myModel;
-	QT::QWidget* parent;
+	QWidget* parent;
 	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_delegate_rva(QT::QWidget*, Idatag_model*, Idatag_configuration*);
-	~Idatag_delegate_rva();
+	Idatag_delegate_rva(QWidget*, Idatag_model*, Idatag_configuration*);
 	void paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
@@ -33,12 +32,11 @@ class Idatag_delegate_name : public QStyledItemDelegate
 	Q_OBJECT
 private:
 	Idatag_model* myModel;
-	QT::QWidget* parent;
+	QWidget* parent;
 	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_delegate_name(QT::QWidget*, Idatag_model*, Idatag_configuration*);
-	~Idatag_delegate_name();
+	Idatag_delegate_name(QWidget*, Idatag_model*, Idatag_configuration*);
 	void paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
@@ -48,15 +46,15 @@ class Idatag_delegate_tag : public QStyledItemDelegate
 private:
 	Idatag_model* myModel;
 	Idatag_palette* myPalette;
-	QT::QWidget* parent;
+	QWidget* parent;
+	Idatag_view* g_myView;
 	QTableView* myView;
 	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_delegate_tag(QT::QWidget*, Idatag_model*, QT::QTableView*, Idatag_configuration*);
-	~Idatag_delegate_tag();
+	Idatag_delegate_tag(QWidget*, Idatag_model*, Idatag_view*, Idatag_configuration*);
 	void paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-	QT::QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
 
@@ -64,8 +62,9 @@ class Idatag_wall : public QListWidget
 {
 	Q_OBJECT
 private:
-	QT::QWidget* parent;
+	QWidget* parent;
 	Idatag_model* myModel;
+	Idatag_view* g_myView;
 	QTableView* myView;
 	Idatag_palette* myPalette;
 	QModelIndex index;
@@ -79,7 +78,7 @@ private:
 	QAction* filter_feeder;
 	QAction* paint_tag;
 
-	void createActions();
+	void create_actions();
 
 private slots:
 	void OnAction_export_tag();
@@ -88,7 +87,8 @@ private slots:
 	void OnAction_paint_tag();
 
 public:
-	Idatag_wall(QT::QWidget*, Idatag_model* , QTableView*, Idatag_palette*, const QModelIndex&, Offset*, Idatag_configuration*);
+	Idatag_wall(QWidget*, Idatag_model* , Idatag_view*, Idatag_palette*, const QModelIndex&, Offset*, Idatag_configuration*);
+	~Idatag_wall();
 	void generate_graph(Tag);
 	void clear_tags();
 	void mouseDoubleClickEvent(QMouseEvent*);

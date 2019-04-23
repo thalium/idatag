@@ -48,14 +48,39 @@ bool Idatag_proxy::filter_string(int source_row, const QModelIndex& source_paren
 	return false;
 }
 
+bool Idatag_proxy::filter_feeder(int source_row, const QModelIndex& source_parent) const
+{
+	if (filter_feeder_input.empty()) return true;
+
+	const Offset* offset = myModel->get_offset_byindex(source_row);
+	if (offset == NULL) return false;
+
+	std::vector<Tag> tags = offset->get_tags();
+	int score = 0;
+
+	for (const auto & tag : tags)
+	{
+		for (const auto & feeder : filter_feeder_input)
+		{
+			if (tag.get_signature().find(feeder) != std::string::npos) {
+				score++;
+			}
+		}
+	}
+	if (score == tags.size()) return false;
+
+	return true;
+}
+
 bool Idatag_proxy::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
 {
 	bool result = true;
 
 	bool condition_filter_string = filter_string(source_row, source_parent);
 	bool condition_filter_empty = filter_empty(source_row, source_parent);
+	bool condition_filter_feeder = filter_feeder(source_row, source_parent);
 
-	result = condition_filter_string && condition_filter_empty;
+	result = condition_filter_string && condition_filter_empty && condition_filter_feeder;
 
 	return result;
 }
@@ -67,9 +92,6 @@ Idatag_proxy::Idatag_proxy(Idatag_model* myModel)
 	this->filter_string_input = "";
 }
 
-Idatag_proxy::~Idatag_proxy() {}
-
-
 void Idatag_proxy::set_filter_empty(Qt::CheckState state)
 {
 	this->filter_empty_input = state;
@@ -78,4 +100,22 @@ void Idatag_proxy::set_filter_empty(Qt::CheckState state)
 void Idatag_proxy::set_filter_string(QString str_filter)
 {
 	this->filter_string_input = str_filter;
+}
+
+void Idatag_proxy::set_filter_feeder(std::vector<std::string> feeders)
+{
+	this->filter_feeder_input = feeders;
+}
+
+std::vector<std::string> Idatag_proxy::get_filter_feeder()
+{
+	return this->filter_feeder_input;
+}
+
+bool Idatag_proxy::is_feeder_filtered(std::string feeder)
+{
+	auto it = std::find(this->filter_feeder_input.begin(), this->filter_feeder_input.end(), feeder);
+	if (it != this->filter_feeder_input.end()) return true;
+
+	return false;
 }

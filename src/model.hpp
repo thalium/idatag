@@ -64,7 +64,7 @@ public:
 Q_DECLARE_METATYPE(Offset*)
 Q_DECLARE_OPAQUE_POINTER(Offset*)
 
-class Idatag_model : public QT::QAbstractTableModel {
+class Idatag_model : public QAbstractTableModel {
 	Q_OBJECT
 private:
 	std::vector<Offset>			mydata;

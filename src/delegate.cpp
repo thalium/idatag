@@ -1,15 +1,13 @@
 #include "delegate.hpp"
 
 
-Idatag_delegate_rva::Idatag_delegate_rva(QT::QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration) :
+Idatag_delegate_rva::Idatag_delegate_rva(QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration) :
 	QStyledItemDelegate()
 {
 	this->parent = parent;
 	this->myModel = myModel;
 	this->myConfiguration = myConfiguration;
 }
-
-Idatag_delegate_rva::~Idatag_delegate_rva() {}
 
 void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const 
 {
@@ -34,15 +32,13 @@ void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& o
 	}
 }
 
-Idatag_delegate_name::Idatag_delegate_name(QT::QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration) :
+Idatag_delegate_name::Idatag_delegate_name(QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration) :
 	QStyledItemDelegate()
 {
 	this->parent = parent;
 	this->myModel = myModel;
 	this->myConfiguration = myConfiguration;
 }
-
-Idatag_delegate_name::~Idatag_delegate_name() {}
 
 void Idatag_delegate_name::paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const 
 {
@@ -57,18 +53,16 @@ void Idatag_delegate_name::paint(QPainter *painter, const QStyleOptionViewItem& 
 	}
 }
 
-
-Idatag_delegate_tag::Idatag_delegate_tag(QT::QWidget* parent, Idatag_model* myModel, QT::QTableView* myView, Idatag_configuration* myConfiguration) :
+Idatag_delegate_tag::Idatag_delegate_tag(QWidget* parent, Idatag_model* myModel, Idatag_view* g_myView, Idatag_configuration* myConfiguration) :
 	QStyledItemDelegate()
 {
 	this->parent = parent;
 	this->myModel = myModel;
-	this->myView = myView;
+	this->g_myView = g_myView;
+	this->myView = g_myView->get_Tb();
 	this->myPalette = new Idatag_palette(this->myModel->get_feeders());
 	this->myConfiguration = myConfiguration;
 }
-
-Idatag_delegate_tag::~Idatag_delegate_tag() {}
 
 void Idatag_delegate_tag::paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const 
 {
@@ -83,11 +77,11 @@ void Idatag_delegate_tag::paint(QPainter *painter, const QStyleOptionViewItem& o
 	}
 }
 
-QT::QWidget* Idatag_delegate_tag::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const 
+QWidget* Idatag_delegate_tag::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const 
 {
 	Offset* offset = index.data().value<Offset*>();
 	std::vector<Tag> tags = offset->get_tags();
-	Idatag_wall* wall = new Idatag_wall(parent, this->myModel,this->myView, this->myPalette, index, offset, this->myConfiguration);
+	Idatag_wall* wall = new Idatag_wall(parent, this->myModel,this->g_myView, this->myPalette, index, offset, this->myConfiguration);
 	wall->clear_tags();
 	for (auto &tag : tags) {
 		wall->generate_graph(tag);
@@ -95,11 +89,13 @@ QT::QWidget* Idatag_delegate_tag::createEditor(QWidget* parent, const QStyleOpti
 	return wall;
 }
 
-Idatag_wall::Idatag_wall(QT::QWidget* parent, Idatag_model* myModel, QTableView* myView, Idatag_palette* myPalette, const QModelIndex& index, Offset* offset, Idatag_configuration* myConfiguration) :
+Idatag_wall::Idatag_wall(QWidget* parent, Idatag_model* myModel, Idatag_view* g_myView, Idatag_palette* myPalette, const QModelIndex& index, Offset* offset, Idatag_configuration* myConfiguration) :
 	QListWidget(parent)
 {
 	this->parent = parent;
 	this->myModel = myModel;
+	this->g_myView = g_myView;
+	this->myView = g_myView->get_Tb();
 	this->myView = myView;
 	this->myPalette = myPalette;
 	this->index = index;
@@ -113,11 +109,21 @@ Idatag_wall::Idatag_wall(QT::QWidget* parent, Idatag_model* myModel, QTableView*
 	this->setLayout(layout);
 
 	installEventFilter(this);
-	createActions();
+	create_actions();
 	connect(this, &Idatag_wall::doubleClicked, this, &Idatag_wall::edit_wall);
 }
 
-void Idatag_wall::createActions()
+Idatag_wall::~Idatag_wall()
+{
+	delete this->layout;
+	delete this->paint_tag;
+	delete this->filter_feeder;
+	delete this->import_tag;
+	delete this->export_tag;
+	delete this->contextual_menu;
+}
+
+void Idatag_wall::create_actions()
 {
 	this->export_tag = new QAction(tr("&Export tags"), this);
 	this->export_tag->setShortcuts(QKeySequence::SaveAs);
@@ -158,7 +164,8 @@ void Idatag_wall::OnAction_import_tag()
 
 void Idatag_wall::OnAction_filter_feeder()
 {
-	msg("\nFilter");
+	g_myView->OnFilter_feeder_update();
+	g_myView->OnFilter_feeder_show();
 }
 
 void Idatag_wall::OnAction_paint_tag()

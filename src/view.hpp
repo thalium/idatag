@@ -21,7 +21,7 @@
 #include "delegate.hpp"
 #include "configuration.hpp"
 
-class Idatag_view : public QT::QWidget{
+class Idatag_view : public QWidget{
 	Q_OBJECT
 private:
 	Idatag_model*		myModel;
@@ -36,12 +36,24 @@ private:
 	QShortcut*			sc_filter;
 	QGridLayout*		layout;
 
+	QWidget* wnd_filter_feeder;
+	QGridLayout* feeder_filter_layout;
+	QVBoxLayout* feeder_layout;
+	QPushButton* btn_filter_feeder_ok;
+	QPushButton* btn_filter_feeder_cancel;
+
 public:
-	Idatag_view(QT::QWidget*, Idatag_model*, Idatag_configuration*);
+	Idatag_view(QWidget*, Idatag_model*, Idatag_configuration*);
 	~Idatag_view();
+
+	QTableView* get_Tb();
 
 	void OnFilter_empty();
 	void OnFilter_string();
+	void OnFilter_feeder();
+	void OnFilter_feeder_update();
+	void OnFilter_feeder_show();
+	void OnFilter_feeder_pass();
 
 	void OnNavigate(const QModelIndex&);
 	void OnSearch();

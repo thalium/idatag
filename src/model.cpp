@@ -390,6 +390,9 @@ bool Offset::check_already_tagged(std::string& label) const
 
 void Offset::add_tag(Tag& tag) 
 {
+	auto it = std::find(this->tags.begin(), this->tags.end(), tag.get_label);
+	if (it != this->tags.end()) return;
+
 	this->tags.push_back(tag);
 }
 

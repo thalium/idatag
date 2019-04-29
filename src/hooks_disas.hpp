@@ -10,8 +10,7 @@
 
 class Idatag_hook_idb {
 public:
-	Idatag_model* myModel;
-	Idatag_hook_idb(Idatag_model*);
+	Idatag_hook_idb();
 	~Idatag_hook_idb();
 };
 
@@ -20,3 +19,55 @@ static ssize_t idaapi  idb_evt_h(void*, int, va_list);
 void evt_rename_h(Idatag_hook_idb&, va_list);
 void evt_byte_patched_h(Idatag_hook_idb&, va_list);
 void evt_cmt_changed_h(Idatag_hook_idb&, va_list);
+
+
+struct show_context_menu_disas_ah_t : public action_handler_t
+{
+	virtual int idaapi activate(action_activation_ctx_t *);
+	virtual action_state_t idaapi update(action_update_ctx_t *);
+};
+
+struct show_context_menu_func_ah_t : public action_handler_t
+{
+	virtual int idaapi activate(action_activation_ctx_t *);
+	virtual action_state_t idaapi update(action_update_ctx_t *);
+};
+
+struct show_context_menu_name_ah_t : public action_handler_t
+{
+	virtual int idaapi activate(action_activation_ctx_t *);
+	virtual action_state_t idaapi update(action_update_ctx_t *);
+};
+
+class Idatag_hook_ui {
+private:
+	action_desc_t desc_disas_menu;
+	action_desc_t desc_func_menu;
+	action_desc_t desc_name_menu;
+
+public:
+	Idatag_hook_ui();
+	~Idatag_hook_ui();
+
+	show_context_menu_disas_ah_t show_context_disas_menu_ah;
+	show_context_menu_func_ah_t show_context_func_menu_ah;
+	show_context_menu_name_ah_t show_context_name_menu_ah;
+};
+
+static ssize_t idaapi  ui_evt_h(void*, int, va_list);
+
+void evt_contextmenu_h(Idatag_hook_ui&, va_list);
+
+class Idatag_hook_idp {
+public:
+	Idatag_hook_idp();
+	~Idatag_hook_idp();
+};
+
+static ssize_t idaapi  idp_evt_h(void*, int, va_list);
+
+void evt_newfile_h(Idatag_hook_idp&, va_list);
+
+extern Idatag_hook_idb* myHook_IDB;
+extern Idatag_hook_ui* myHook_UI;
+extern Idatag_hook_idp* myHook_IDP;

@@ -6,12 +6,15 @@
 #include <kernwin.hpp>
 
 #include <string>
+#include <filesystem>
 
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qlabel.h>
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qpushbutton.h>
 #include <QtWidgets/QGridLayout>
+
+namespace fs = std::filesystem;
 
 struct show_menu_configuration_ah_t : public action_handler_t
 {

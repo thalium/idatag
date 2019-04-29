@@ -9,6 +9,7 @@
 #include <name.hpp>
 #include <funcs.hpp>
 #include <bytes.hpp>
+#include <nalt.hpp>
 
 #include "json.hpp"
 #include "configuration.hpp"
@@ -93,6 +94,7 @@ public:
 	//void remove_offset(const uint64_t&);
 	Offset* get_offset_byrva(const uint64_t&);
 	Offset* get_offset_byindex(int) const ;
+	QModelIndex get_index_byrva(const uint64_t&);
 	bool compare_offset_rva(const uint64_t&, Offset&) const;
 
 	void add_feeder(std::string&);
@@ -110,3 +112,5 @@ public:
 	void import_tags();
 	void export_tags() const;
 };
+
+extern Idatag_model* myModel;

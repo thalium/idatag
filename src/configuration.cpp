@@ -13,7 +13,16 @@ action_state_t idaapi show_menu_configuration_ah_t::update(action_update_ctx_t *
 
 Idatag_configuration::Idatag_configuration() 
 {
-	this->path = std::string(get_path(PATH_TYPE_IDB));
+	char curdir[QMAXPATH];
+	char filename[QMAXPATH];
+
+	fs::path current_path = fs::path(curdir);
+	fs::path repository = fs::path("tags");
+	fs::path tag_path = current_path /= repository;
+	get_root_filename(filename, QMAXPATH - 1);
+	fs::path spec_tag_path = tag_path /= filename;
+
+	this->path = spec_tag_path.string();
 	this->username = std::string("User");
 	this->base = get_imagebase();
 	if (inf.is_64bit()) {

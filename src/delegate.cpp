@@ -70,7 +70,7 @@ void Idatag_delegate_tag::paint(QPainter *painter, const QStyleOptionViewItem& o
 	
 	Offset* offset = index.data().value<Offset*>();
 	if (offset != NULL) {
-		myView->openPersistentEditor(index); // isPersistentEditorOpen introduced in Qt5.10 (IDA7.2 offers Qt5.3)
+		this->myView->openPersistentEditor(index); // isPersistentEditorOpen introduced in Qt5.10 (IDA7.2 offers Qt5.3)
 	}
 	else {
 		QStyledItemDelegate::paint(painter, option, index);

@@ -18,7 +18,6 @@ void Idatag_model::init_model()
 {
 	import_info_disas();
 	import_tags();
-	print_stats_model();
 }
 
 const int Idatag_model::count_stats_tags() const
@@ -34,7 +33,7 @@ void Idatag_model::print_stats_model()
 {
 	size_t nb_tags = count_stats_tags();
 	size_t nb_offsets = this->mydata.size();
-	msg("\n[IDATag] Tags : %d on %d offsets!", nb_tags, nb_offsets);
+	msg("\n[IDATag] Tags : %d on %d offsets!\n", nb_tags, nb_offsets);
 }
 
 const std::vector<Offset>& Idatag_model::get_data() const 
@@ -181,6 +180,22 @@ bool Idatag_model::compare_offset_rva(const uint64_t& rva, Offset& offset) const
 	return false;
 }
 
+QModelIndex Idatag_model::get_index_byrva(const uint64_t& rva)
+{
+	uint row = 0;
+	for (const auto & offset : this->mydata)
+	{
+		row++;
+		const uint64_t offset_rva = offset.get_rva();
+		if (offset_rva == rva)
+		{
+			QModelIndex index = this->index(row, 0);
+			return index;
+		}
+	}
+	return QModelIndex();
+}
+
 /*
 void Idatag_model::remove_offset(const uint64_t& rva) FIXME
 {
@@ -300,13 +315,16 @@ void Idatag_model::import_files(const fs::path& path_tags)
 void Idatag_model::import_tags() 
 {
 	char curdir[QMAXPATH];
+	char filename[QMAXPATH];
 	try {
 		qgetcwd(curdir, sizeof(curdir));
 		fs::path current_path = fs::path(curdir);
 		fs::path repository = fs::path("tags");
 		fs::path tag_path = current_path /= repository;
+		get_root_filename(filename, QMAXPATH - 1);
+		fs::path spec_tag_path = tag_path /= filename;
 
-		import_files(tag_path);
+		import_files(spec_tag_path);
 	}
 	catch (fs::filesystem_error& e)
 	{
@@ -336,12 +354,29 @@ void Idatag_model::export_tags() const
 				jsonArray.push_back(jsonTag);
 			}
 		}
+
+		char curdir[QMAXPATH];
+		char filename[QMAXPATH];
+
 		if (this->myConfiguration->get_path_configuration().empty())
 		{
-			file = fs::path(std::string(get_path(PATH_TYPE_IDB)) + ".json");
+			qgetcwd(curdir, sizeof(curdir));
+			fs::path current_path = fs::path(curdir);
+			fs::path repository = fs::path("tags");
+			fs::path tag_path = current_path /= repository;
+			get_root_filename(filename, QMAXPATH - 1);
+			fs::path spec_tag_path = tag_path /= filename;
+			spec_tag_path /= filename;
+			fs::path extension = fs::path(".json");
+			file = spec_tag_path += extension;
 		}
 		else {
-			file = fs::path(this->myConfiguration->get_path_configuration() + ".json");
+			fs::path tag_path = fs::path(this->myConfiguration->get_path_configuration());
+			get_root_filename(filename, QMAXPATH - 1);
+			fs::path spec_tag_path = tag_path /= filename;
+			spec_tag_path /= filename;
+			fs::path extension = fs::path(".json");
+			file = spec_tag_path += extension;
 		}
 		jsonFile.open(file);
 		jsonFile << jsonArray.dump().c_str();
@@ -390,10 +425,8 @@ bool Offset::check_already_tagged(std::string& label) const
 
 void Offset::add_tag(Tag& tag) 
 {
-	auto it = std::find(this->tags.begin(), this->tags.end(), tag.get_label);
-	if (it != this->tags.end()) return;
-
-	this->tags.push_back(tag);
+	std::string lbl = tag.get_label();
+	if(!check_already_tagged(lbl)) this->tags.push_back(tag);
 }
 
 const std::vector<Tag> Offset::get_tags() const

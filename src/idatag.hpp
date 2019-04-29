@@ -19,3 +19,9 @@ static const char help[] = "IDATag";
 static const char comment[] = "Analysis helper";
 static const char wanted_name[] = "IDATag";
 static const char wanted_hotkey[] = "Ctrl+Alt+T";
+
+Idatag_configuration* myConfiguration;
+Idatag_model* myModel;
+Idatag_hook_idb* myHook_IDB;
+Idatag_hook_ui* myHook_UI;
+Idatag_hook_idp* myHook_IDP;

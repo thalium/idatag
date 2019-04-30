@@ -54,7 +54,7 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 	this->wnd_filter_feeder = new QWidget();
 	this->feeder_filter_layout = new QGridLayout(wnd_filter_feeder);
 	this->feeder_layout = new QVBoxLayout();
-	wnd_filter_feeder->setWindowTitle("IDATag] Filter by feeders...");
+	wnd_filter_feeder->setWindowTitle("[IDATag] Filter by feeders...");
 	this->btn_filter_feeder_ok = new QPushButton("OK");
 	this->btn_filter_feeder_cancel = new QPushButton("Cancel");
 
@@ -187,4 +187,101 @@ void Idatag_view::OnSearch()
 {
 	this->tf->setFocus();
 	this->tf->selectAll();
+}
+
+void Idatag_context::context_menu_add_tags()
+{
+	QString qinput = this->tags_input->text();
+	std::string input = qinput.toStdString();
+	Offset* offset = myModel->get_offset_byrva(this->rva);
+
+	if (offset == NULL) 
+	{
+		msg("\n[IDATag] Error retrieving referenced offset");
+		this->close();
+	}
+
+	if (input.find_first_not_of(" ") != std::string::npos)
+	{
+		QStringList labels = this->tags_input->text().split(" ");
+		for (const auto & qlabel : labels)
+		{
+			std::string user = myConfiguration->get_username_configuration();
+			std::string feeder = user;
+
+			std::string label = qlabel.toStdString();
+			Tag tag = Tag(label, feeder);
+			
+			offset->add_tag(tag);
+
+			std::string autofeed = "IDATag";
+			Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+			offset->add_tag(tag_user);
+
+			myModel->add_feeder(feeder);
+			myModel->add_feeder(autofeed);
+		}
+
+	}
+	this->close();
+}
+
+void Idatag_context::context_menu_pass()
+{
+	this->close();
+}
+
+Idatag_context::Idatag_context(action_activation_ctx_t* ctx)
+{
+	this->ctx = ctx;
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->menu_layout = new QGridLayout(this);
+	this->setWindowTitle("[IDATag] Add tags...");
+	this->btn_menu_ok = new QPushButton("OK");
+	this->btn_menu_cancel = new QPushButton("Cancel");
+
+	this->tags_input = new QLineEdit();
+
+	char rva_str[20];
+	this->rva = ctx->cur_ea;
+	if (myConfiguration->get_address_width_configuration() == 16)
+	{
+		snprintf(rva_str, 19, "0x%016llX", rva);
+	}
+	else
+	{
+		snprintf(rva_str, 19, "0x%08llX", rva);
+	}
+	this->lbl_rva = new QLabel(rva_str);
+	
+	qstring out;
+	if (get_ea_name(&out, ctx->cur_ea))
+	{
+		this->lbl_name = new QLabel(out.c_str());
+	}
+	else
+	{
+		this->lbl_name = new QLabel();
+	}
+
+	this->menu_layout->addWidget(lbl_rva, 0, 0);
+	this->menu_layout->addWidget(lbl_name, 0, 1);
+
+	this->menu_layout->addWidget(tags_input, 1, 0, 1, 2);
+
+	this->menu_layout->addWidget(btn_menu_ok, 2, 0);
+	this->menu_layout->addWidget(btn_menu_cancel, 2, 1);
+
+	this->connect(btn_menu_ok, &QPushButton::clicked, this, &Idatag_context::context_menu_add_tags);
+	this->connect(btn_menu_cancel, &QPushButton::clicked, this, &Idatag_context::context_menu_pass);
+}
+
+void create_wnd_context_func_disas(QWidget* wnd, action_activation_ctx_t* ctx)
+{
+
+}
+
+void create_wnd_context_name_disas(QWidget* wnd, action_activation_ctx_t* ctx)
+{
+
 }

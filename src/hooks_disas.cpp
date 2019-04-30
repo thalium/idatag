@@ -85,9 +85,10 @@ static ssize_t idaapi idb_evt_h(void* user_data, int notification_code, va_list 
 	return 0;
 }
 
-int idaapi show_context_menu_disas_ah_t::activate(action_activation_ctx_t *)
+int idaapi show_context_menu_disas_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	msg("\nDISAIS!");
+	Idatag_context* context_menu = new Idatag_context(ctx);
+	context_menu->show();
 	return 0;
 }
 
@@ -96,9 +97,10 @@ action_state_t idaapi show_context_menu_disas_ah_t::update(action_update_ctx_t *
 	return AST_ENABLE_ALWAYS;
 }
 
-int idaapi show_context_menu_func_ah_t::activate(action_activation_ctx_t *)
+int idaapi show_context_menu_func_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	msg("\nFunc!");
+	//Idatag_context* context_menu = new Idatag_context(ctx);
+	//context_menu->show();
 	return 0;
 }
 
@@ -107,9 +109,10 @@ action_state_t idaapi show_context_menu_func_ah_t::update(action_update_ctx_t *)
 	return AST_ENABLE_ALWAYS;
 }
 
-int idaapi show_context_menu_name_ah_t::activate(action_activation_ctx_t *)
+int idaapi show_context_menu_name_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	msg("\nNAME!");
+	//Idatag_context* context_menu = new Idatag_context(ctx);
+	//context_menu->show();
 	return 0;
 }
 

@@ -58,3 +58,22 @@ public:
 	void OnNavigate(const QModelIndex&);
 	void OnSearch();
 };
+
+class Idatag_context : public QWidget {
+	Q_OBJECT
+private:
+	action_activation_ctx_t* ctx;
+	QGridLayout* menu_layout;
+	QPushButton* btn_menu_ok;
+	QPushButton* btn_menu_cancel;
+	QLineEdit* tags_input;
+	uint64_t rva;
+	QLabel* lbl_rva;
+	QLabel* lbl_name;
+
+public:
+	Idatag_context(action_activation_ctx_t*);
+
+	void context_menu_add_tags();
+	void context_menu_pass();
+};

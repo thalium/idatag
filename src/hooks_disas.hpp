@@ -6,6 +6,7 @@
 #include <kernwin.hpp>
 
 #include "model.hpp"
+#include "view.hpp"
 #include "configuration.hpp"
 
 class Idatag_hook_idb {

@@ -11,7 +11,7 @@ stages:
 Ida32Build:
   stage: build
   tags:
-    - VS2017
+    - msvc2017
   script:
     - echo "Release build with PDB..."
     - echo "  --> IDA Pro (32-bit) version..."
@@ -33,7 +33,7 @@ Ida32Build:
 Ida64Build:
   stage: build
   tags:
-    - VS2017
+    - msvc2017
   script:
     - echo "Release build with PDB..."
     - echo "  --> IDA Pro (64-bit) version..."

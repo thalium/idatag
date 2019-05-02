@@ -1,11 +1,9 @@
 cmake_minimum_required (VERSION 3.10.0)
 project(IDATag)
 
-#set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-#set(QT_MOC_EXECUTABLE "$ENV{QTHEADER}/../bin/moc.exe")
 set(CMAKE_PREFIX_PATH "C:\\Qt\\Qt5.3.0\\5.3\\msvc2013_64")
 find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
 

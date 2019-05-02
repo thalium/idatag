@@ -189,13 +189,13 @@ void Idatag_view::OnSearch()
 	this->tf->selectAll();
 }
 
-void Idatag_context::context_menu_add_tags()
+void Idatag_context_disas::context_menu_add_tags()
 {
 	QString qinput = this->tags_input->text();
 	std::string input = qinput.toStdString();
-	Offset* offset = myModel->get_offset_byrva(this->rva);
+	this->offset = myModel->get_offset_byrva(this->rva);
 
-	if (offset == NULL) 
+	if (this->offset == NULL)
 	{
 		msg("\n[IDATag] Error retrieving referenced offset");
 		this->close();
@@ -212,11 +212,11 @@ void Idatag_context::context_menu_add_tags()
 			std::string label = qlabel.toStdString();
 			Tag tag = Tag(label, feeder);
 			
-			offset->add_tag(tag);
+			this->offset->add_tag(tag);
 
 			std::string autofeed = "IDATag";
 			Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
-			offset->add_tag(tag_user);
+			this->offset->add_tag(tag_user);
 
 			myModel->add_feeder(feeder);
 			myModel->add_feeder(autofeed);
@@ -226,12 +226,12 @@ void Idatag_context::context_menu_add_tags()
 	this->close();
 }
 
-void Idatag_context::context_menu_pass()
+void Idatag_context_disas::context_menu_pass()
 {
 	this->close();
 }
 
-Idatag_context::Idatag_context(action_activation_ctx_t* ctx)
+Idatag_context_disas::Idatag_context_disas(action_activation_ctx_t* ctx)
 {
 	this->ctx = ctx;
 	this->setAttribute(Qt::WA_DeleteOnClose);
@@ -272,16 +272,203 @@ Idatag_context::Idatag_context(action_activation_ctx_t* ctx)
 	this->menu_layout->addWidget(btn_menu_ok, 2, 0);
 	this->menu_layout->addWidget(btn_menu_cancel, 2, 1);
 
-	this->connect(btn_menu_ok, &QPushButton::clicked, this, &Idatag_context::context_menu_add_tags);
-	this->connect(btn_menu_cancel, &QPushButton::clicked, this, &Idatag_context::context_menu_pass);
+	this->connect(btn_menu_ok, &QPushButton::clicked, this, &Idatag_context_disas::context_menu_add_tags);
+	this->connect(btn_menu_cancel, &QPushButton::clicked, this, &Idatag_context_disas::context_menu_pass);
 }
 
-void create_wnd_context_func_disas(QWidget* wnd, action_activation_ctx_t* ctx)
+void Idatag_context_name::context_menu_add_tags()
 {
+	QString qinput = this->tags_input->text();
+	std::string input = qinput.toStdString();
 
+	if (input.find_first_not_of(" ") != std::string::npos)
+	{
+		for (const auto & name : this->name_selected) {
+			Offset* offset = myModel->get_offset_byrva(name);
+
+			if (offset == NULL)
+			{
+				msg("\n[IDATag] Error retrieving referenced offset");
+				this->close();
+			}
+
+			QStringList labels = this->tags_input->text().split(" ");
+			for (const auto & qlabel : labels)
+			{
+				std::string user = myConfiguration->get_username_configuration();
+				std::string feeder = user;
+
+				std::string label = qlabel.toStdString();
+				Tag tag = Tag(label, feeder);
+
+				offset->add_tag(tag);
+
+				std::string autofeed = "IDATag";
+				Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+				offset->add_tag(tag_user);
+
+				myModel->add_feeder(feeder);
+				myModel->add_feeder(autofeed);
+			}
+
+		}
+	}
+	this->close();
 }
 
-void create_wnd_context_name_disas(QWidget* wnd, action_activation_ctx_t* ctx)
+void Idatag_context_name::context_menu_pass()
 {
+	this->close();
+}
 
+Idatag_context_name::Idatag_context_name(action_activation_ctx_t* ctx)
+{
+	this->ctx = ctx;
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->menu_layout = new QGridLayout(this);
+	this->setWindowTitle("[IDATag] Add tags...");
+	this->btn_menu_ok = new QPushButton("OK");
+	this->btn_menu_cancel = new QPushButton("Cancel");
+
+	this->tags_input = new QLineEdit();
+
+
+	for (const auto & name_id : ctx->chooser_selection)
+	{
+		uint64_t ea = get_nlist_ea(name_id);
+		this->name_selected.push_back(ea);
+	}
+
+	if (this->name_selected.size() == 1)
+	{
+		char rva_str[20];
+		if (myConfiguration->get_address_width_configuration() == 16)
+		{
+			snprintf(rva_str, 19, "0x%016llX", this->name_selected.front());
+		}
+		else
+		{
+			snprintf(rva_str, 19, "0x%08llX", this->name_selected.front());
+		}
+		this->lbl_rva = new QLabel(rva_str);
+
+		const char* name = get_nlist_name(0);
+		this->lbl_name = new QLabel(name);
+	}
+	else {
+		char name_str[50];
+		snprintf(name_str, 49, "%zu names selected", this->name_selected.size());
+		this->lbl_rva = new QLabel(name_str);
+		this->lbl_name = new QLabel();
+	}
+
+	this->menu_layout->addWidget(lbl_rva, 0, 0);
+	this->menu_layout->addWidget(lbl_name, 0, 1);
+
+	this->menu_layout->addWidget(tags_input, 1, 0, 1, 2);
+
+	this->menu_layout->addWidget(btn_menu_ok, 2, 0);
+	this->menu_layout->addWidget(btn_menu_cancel, 2, 1);
+
+	this->connect(btn_menu_ok, &QPushButton::clicked, this, &Idatag_context_name::context_menu_add_tags);
+	this->connect(btn_menu_cancel, &QPushButton::clicked, this, &Idatag_context_name::context_menu_pass);
+}
+
+void Idatag_context_func::context_menu_add_tags()
+{
+	QString qinput = this->tags_input->text();
+	std::string input = qinput.toStdString();
+
+	if (input.find_first_not_of(" ") != std::string::npos)
+	{
+		for (const auto & func : this->func_selected) {
+			Offset* offset = myModel->get_offset_byrva(func->start_ea);
+
+			if (offset == NULL)
+			{
+				msg("\n[IDATag] Error retrieving referenced offset");
+				this->close();
+			}
+
+			QStringList labels = this->tags_input->text().split(" ");
+			for (const auto & qlabel : labels)
+			{
+				std::string user = myConfiguration->get_username_configuration();
+				std::string feeder = user;
+
+				std::string label = qlabel.toStdString();
+				Tag tag = Tag(label, feeder);
+
+				offset->add_tag(tag);
+
+				std::string autofeed = "IDATag";
+				Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+				offset->add_tag(tag_user);
+
+				myModel->add_feeder(feeder);
+				myModel->add_feeder(autofeed);
+			}
+
+		}
+	}
+	this->close();
+}
+
+void Idatag_context_func::context_menu_pass()
+{
+	this->close();
+}
+
+Idatag_context_func::Idatag_context_func(action_activation_ctx_t* ctx)
+{
+	this->ctx = ctx;
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->menu_layout = new QGridLayout(this);
+	this->setWindowTitle("[IDATag] Add tags...");
+	this->btn_menu_ok = new QPushButton("OK");
+	this->btn_menu_cancel = new QPushButton("Cancel");
+
+	this->tags_input = new QLineEdit();
+
+
+	for (const auto & func_id : ctx->chooser_selection)
+	{
+		func_t* func = getn_func(func_id);
+		this->func_selected.push_back(func);
+	}
+
+	if (this->func_selected.size() == 1)
+	{
+		char rva_str[20];
+		if (myConfiguration->get_address_width_configuration() == 16)
+		{
+			snprintf(rva_str, 19, "0x%016llX", this->func_selected.front()->start_ea);
+		}
+		else
+		{
+			snprintf(rva_str, 19, "0x%08llX", this->func_selected.front()->start_ea);
+		}
+		this->lbl_rva = new QLabel(rva_str);
+
+		qstring name_func;
+		get_func_name(&name_func, this->func_selected.front()->start_ea);
+		this->lbl_name = new QLabel(name_func.c_str());
+	}
+	else {
+		char func_str[50];
+		snprintf(func_str, 49, "%zu functions selected", this->func_selected.size());
+		this->lbl_rva = new QLabel(func_str);
+		this->lbl_name = new QLabel();
+	}
+
+	this->menu_layout->addWidget(lbl_rva, 0, 0);
+	this->menu_layout->addWidget(lbl_name, 0, 1);
+
+	this->menu_layout->addWidget(tags_input, 1, 0, 1, 2);
+
+	this->menu_layout->addWidget(btn_menu_ok, 2, 0);
+	this->menu_layout->addWidget(btn_menu_cancel, 2, 1);
+
+	this->connect(btn_menu_ok, &QPushButton::clicked, this, &Idatag_context_func::context_menu_add_tags);
+	this->connect(btn_menu_cancel, &QPushButton::clicked, this, &Idatag_context_func::context_menu_pass);
 }

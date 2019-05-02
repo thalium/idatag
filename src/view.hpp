@@ -59,7 +59,7 @@ public:
 	void OnSearch();
 };
 
-class Idatag_context : public QWidget {
+class Idatag_context_disas : public QWidget {
 	Q_OBJECT
 private:
 	action_activation_ctx_t* ctx;
@@ -70,9 +70,50 @@ private:
 	uint64_t rva;
 	QLabel* lbl_rva;
 	QLabel* lbl_name;
+	Offset* offset;
 
 public:
-	Idatag_context(action_activation_ctx_t*);
+	Idatag_context_disas(action_activation_ctx_t*);
+
+	void context_menu_add_tags();
+	void context_menu_pass();
+};
+
+class Idatag_context_func : public QWidget {
+	Q_OBJECT
+private:
+	action_activation_ctx_t* ctx;
+	QGridLayout* menu_layout;
+	QPushButton* btn_menu_ok;
+	QPushButton* btn_menu_cancel;
+	QLineEdit* tags_input;
+	QLabel* lbl_rva;
+	std::vector<func_t*> func_selected;
+	QLabel* lbl_selection;
+	QLabel* lbl_name;
+
+public:
+	Idatag_context_func(action_activation_ctx_t*);
+
+	void context_menu_add_tags();
+	void context_menu_pass();
+};
+
+class Idatag_context_name : public QWidget {
+	Q_OBJECT
+private:
+	action_activation_ctx_t* ctx;
+	QGridLayout* menu_layout;
+	QPushButton* btn_menu_ok;
+	QPushButton* btn_menu_cancel;
+	QLineEdit* tags_input;
+	QLabel* lbl_rva;
+	std::vector<uint64_t> name_selected;
+	QLabel* lbl_selection;
+	QLabel* lbl_name;
+
+public:
+	Idatag_context_name(action_activation_ctx_t*);
 
 	void context_menu_add_tags();
 	void context_menu_pass();

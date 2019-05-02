@@ -87,7 +87,7 @@ static ssize_t idaapi idb_evt_h(void* user_data, int notification_code, va_list 
 
 int idaapi show_context_menu_disas_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	Idatag_context* context_menu = new Idatag_context(ctx);
+	Idatag_context_disas* context_menu = new Idatag_context_disas(ctx);
 	context_menu->show();
 	return 0;
 }
@@ -99,8 +99,8 @@ action_state_t idaapi show_context_menu_disas_ah_t::update(action_update_ctx_t *
 
 int idaapi show_context_menu_func_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	//Idatag_context* context_menu = new Idatag_context(ctx);
-	//context_menu->show();
+	Idatag_context_func* context_menu = new Idatag_context_func(ctx);
+	context_menu->show();
 	return 0;
 }
 
@@ -111,8 +111,8 @@ action_state_t idaapi show_context_menu_func_ah_t::update(action_update_ctx_t *)
 
 int idaapi show_context_menu_name_ah_t::activate(action_activation_ctx_t *ctx)
 {
-	//Idatag_context* context_menu = new Idatag_context(ctx);
-	//context_menu->show();
+	Idatag_context_name* context_menu = new Idatag_context_name(ctx);
+	context_menu->show();
 	return 0;
 }
 

@@ -18,8 +18,8 @@
 
 #include "model.hpp"
 #include "proxy.hpp"
-#include "delegate.hpp"
 #include "configuration.hpp"
+#include "delegate.hpp"
 
 class Idatag_view : public QWidget{
 	Q_OBJECT
@@ -41,12 +41,17 @@ private:
 	QVBoxLayout* feeder_layout;
 	QPushButton* btn_filter_feeder_ok;
 	QPushButton* btn_filter_feeder_cancel;
+	
+	//Idatag_delegate_rva* delegate_rva;
+	//Idatag_delegate_name* delegate_name;
+	//Idatag_delegate_tag* delegate_tag;
 
 public:
 	Idatag_view(QWidget*, Idatag_model*, Idatag_configuration*);
 	~Idatag_view();
 
 	QTableView* get_Tb();
+	//Idatag_delegate_tag* get_delegate_tag();
 
 	void OnFilter_empty();
 	void OnFilter_string();
@@ -58,6 +63,8 @@ public:
 	void OnNavigate(const QModelIndex&);
 	void OnSearch();
 };
+
+extern Idatag_view* myView;
 
 class Idatag_context_disas : public QWidget {
 	Q_OBJECT

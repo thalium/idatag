@@ -2,7 +2,6 @@
 
 using json = nlohmann::json;
 
-
 bool check_rva(uint64_t rva)
 {
 	return is_mapped(rva);
@@ -12,7 +11,6 @@ Idatag_model::Idatag_model(Idatag_configuration* configuration)
 {
 	this->myConfiguration = configuration;
 }
-
 
 void Idatag_model::init_model() 
 {

@@ -9,7 +9,7 @@ bool idaapi run(size_t)
 		ida_widget = create_empty_widget(name);
 		if (myConfiguration == NULL) return false;
 
-		Idatag_view* myView = new Idatag_view((QWidget *)ida_widget, myModel, myConfiguration);
+		myView = new Idatag_view((QWidget *)ida_widget, myModel, myConfiguration);
 		if (myView == NULL) return false;
 		display_widget(ida_widget, WOPN_TAB);
 	}

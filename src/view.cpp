@@ -20,9 +20,13 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 
 	this->tb->verticalHeader()->hide();
 
-	this->tb->setItemDelegateForColumn(0, new Idatag_delegate_rva(this->parent, this->myModel, this->myConfiguration));
-	this->tb->setItemDelegateForColumn(1, new Idatag_delegate_name(this->parent, this->myModel, this->myConfiguration));
-	this->tb->setItemDelegateForColumn(2, new Idatag_delegate_tag(this->parent, this->myModel, this, this->myConfiguration));
+	Idatag_delegate_rva* delegate_rva = new Idatag_delegate_rva(this->parent, this->myModel, this->myConfiguration);
+	Idatag_delegate_name* delegate_name = new Idatag_delegate_name(this->parent, this->myModel, this->myConfiguration);
+	Idatag_delegate_tag* delegate_tag = new Idatag_delegate_tag(this->parent, this->myModel, this, this->myConfiguration);
+
+	this->tb->setItemDelegateForColumn(0, delegate_rva);
+	this->tb->setItemDelegateForColumn(1, delegate_name);
+	this->tb->setItemDelegateForColumn(2, delegate_tag);
 
 	this->hheader = this->tb->horizontalHeader();
 	this->hheader->setSectionsMovable(true);
@@ -86,6 +90,11 @@ QTableView* Idatag_view::get_Tb()
 {
 	return this->tb;
 }
+
+/*Idatag_delegate_tag* Idatag_view::get_delegate_tag()
+{
+	return this->delegate_tag;
+}*/
 
 void Idatag_view::OnFilter_feeder_update()
 {

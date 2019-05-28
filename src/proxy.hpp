@@ -16,6 +16,8 @@ public:
 	void set_filter_feeder(std::vector<std::string>);
 	std::vector<std::string> get_filter_feeder();
 	bool is_feeder_filtered(std::string);
+	bool is_label_filtered(std::string);
+	void reset_filters();
 
 	friend class Idatag_view;
 

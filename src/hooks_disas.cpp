@@ -29,18 +29,6 @@ void evt_rename_h(Idatag_hook_idb& myHook_IDB, va_list args)
 	if (!new_name.empty()) offset->set_name(new_name);
 	
 	touch_rva(offset);
-	/*
-	Pour le refresh, il est nécessaire de supprimer l'editor de la row/column (Wall)...
-	
-	//myHook_IDB.myView->repaint();
-	QModelIndex index_top = myHook_IDB.myModel->get_index_byrva(ea);
-	if (index_top.isValid())
-	{
-		QModelIndex index_bottom = index_top.sibling(index_top.row(), index_top.column() + 2);
-		//myHook_IDB.myView->closePersistentEditor(index_bottom);
-		myHook_IDB.myView->openPersistentEditor(index_bottom);
-	}
-	*/
 }
 
 void evt_byte_patched_h(Idatag_hook_idb& myHook_IDB, va_list args)

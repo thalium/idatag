@@ -88,8 +88,8 @@ bool Idatag_proxy::filterAcceptsRow(int source_row, const QModelIndex& source_pa
 Idatag_proxy::Idatag_proxy(Idatag_model* myModel)
 {
 	this->myModel = myModel;
-	this->filter_empty_input = Qt::Unchecked;
-	this->filter_string_input = "";
+	this->filter_empty_input = Qt::Checked;
+	this->filter_string_input = QString("");
 }
 
 void Idatag_proxy::set_filter_empty(Qt::CheckState state)
@@ -112,10 +112,28 @@ std::vector<std::string> Idatag_proxy::get_filter_feeder()
 	return this->filter_feeder_input;
 }
 
+void Idatag_proxy::reset_filters()
+{
+	this->set_filter_empty(Qt::Unchecked);
+	this->set_filter_string("");
+	std::vector<std::string> empty;
+	this->set_filter_feeder(empty);
+}
+
 bool Idatag_proxy::is_feeder_filtered(std::string feeder)
 {
 	auto it = std::find(this->filter_feeder_input.begin(), this->filter_feeder_input.end(), feeder);
 	if (it != this->filter_feeder_input.end()) return true;
 
+	return false;
+}
+
+bool Idatag_proxy::is_label_filtered(std::string label)
+{
+	std::string str_filter = this->filter_string_input.toStdString();
+
+	if (str_filter.empty()) return false;
+	if (label.find(str_filter) != std::string::npos) return true;
+	
 	return false;
 }

@@ -2,6 +2,7 @@
 
 int idaapi show_menu_configuration_ah_t::activate(action_activation_ctx_t *)
 {
+	myConfiguration->refresh_configuration();
 	myConfiguration->show_menu_configuration();
 	return 0;
 }
@@ -13,18 +14,9 @@ action_state_t idaapi show_menu_configuration_ah_t::update(action_update_ctx_t *
 
 Idatag_configuration::Idatag_configuration() 
 {
-	char curdir[QMAXPATH];
-	char filename[QMAXPATH];
-
-	fs::path current_path = fs::path(curdir);
-	fs::path repository = fs::path("tags");
-	fs::path tag_path = current_path /= repository;
-	get_root_filename(filename, QMAXPATH - 1);
-	fs::path spec_tag_path = tag_path /= filename;
-
-	this->path = spec_tag_path.string();
 	this->username = std::string("User");
 	this->base = get_imagebase();
+	
 	if (inf.is_64bit()) {
 		this->address_width = 16;
 	}
@@ -60,7 +52,8 @@ void Idatag_configuration::uninstall_menu_configuration()
 
 void Idatag_configuration::create_menu_configuration()
 {
-	this->menu_configuration = new QWidget();
+	this->menu_configuration = new QDialog();
+	this->menu_configuration->setModal(true);
 	this->menu_lab_path = new QLabel("Export JSON file path : ");
 	this->menu_lab_user = new QLabel("Username : ");
 	QString qusername = QString::fromStdString(this->username);
@@ -78,15 +71,39 @@ void Idatag_configuration::create_menu_configuration()
 	this->layout->addWidget(this->menu_button_ok, 2, 0);
 	this->layout->addWidget(this->menu_button_cancel, 2, 1);
 
-	this->menu_configuration->setWindowTitle("[IDATag Configuration...");
+	this->menu_configuration->setWindowTitle("[IDATag] Configuration...");
 
-	connect(this->menu_button_ok, &QPushButton::pressed, this, &Idatag_configuration::refresh_configuration);
+	connect(this->menu_button_ok, &QPushButton::pressed, this, &Idatag_configuration::set_configuration);
 	connect(this->menu_button_cancel, &QPushButton::pressed, this, &Idatag_configuration::close_configuration);
 
 	this->menu_configuration->resize(360, 120);
 }
 
-void Idatag_configuration::refresh_configuration()
+void Idatag_configuration::refresh_configuration() 
+{
+	QString qusername = QString::fromStdString(this->username);
+	QString qpath = QString::fromStdString(this->path);
+	this->menu_line_path->setText(qpath);
+	this->menu_line_user->setText(qusername);
+}
+
+void Idatag_configuration::load_configuration()
+{
+	if (myConfiguration->get_path_configuration().empty())
+	{
+		char filename[QMAXPATH];
+		fs::path current_path = fs::current_path();
+		fs::path repository = fs::path("tags");
+		fs::path tag_path = current_path /= repository;
+		get_root_filename(filename, QMAXPATH - 1);
+		fs::path spec_tag_path = tag_path /= filename;
+
+		myConfiguration->set_filename_configuration(filename);
+		myConfiguration->set_path_configuration(spec_tag_path.string());
+	}
+}
+
+void Idatag_configuration::set_configuration()
 {
 	QString qpath = this->menu_line_path->text();
 	QString qusername = this->menu_line_user->text();
@@ -145,4 +162,14 @@ uint32_t Idatag_configuration::get_address_width_configuration()
 void Idatag_configuration::set_address_width_configuration(uint32_t address_width) 
 {
 	this->address_width = address_width;
+}
+
+void Idatag_configuration::set_filename_configuration(const char* filename)
+{
+	this->filename = std::string(filename);
+}
+
+std::string Idatag_configuration::get_filename_configuration()
+{
+	return this->filename;
 }

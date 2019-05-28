@@ -13,6 +13,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtCore/Qt>
 #include <QtGui/QContextMenuEvent>
+#include <QtWidgets/QDialog>
 
 #include <ida.hpp>
 
@@ -30,6 +31,7 @@ private:
 	QWidget*			parent;
 	QTableView*			tb;
 	QHeaderView*		hheader;
+	QHeaderView*		vheader;
 	QCheckBox*			cbox;
 	QLineEdit*			tf;
 	QLabel*				tfl;
@@ -41,17 +43,17 @@ private:
 	QVBoxLayout* feeder_layout;
 	QPushButton* btn_filter_feeder_ok;
 	QPushButton* btn_filter_feeder_cancel;
-	
-	//Idatag_delegate_rva* delegate_rva;
-	//Idatag_delegate_name* delegate_name;
-	//Idatag_delegate_tag* delegate_tag;
+
+	QMenu* contextual_menu;
+	QAction* export_tag;
+	QAction* import_tag;
+	QAction* filter_feeder;
+	QAction* paint_tag;
+	QAction* reset_filter;
 
 public:
 	Idatag_view(QWidget*, Idatag_model*, Idatag_configuration*);
 	~Idatag_view();
-
-	QTableView* get_Tb();
-	//Idatag_delegate_tag* get_delegate_tag();
 
 	void OnFilter_empty();
 	void OnFilter_string();
@@ -62,11 +64,19 @@ public:
 
 	void OnNavigate(const QModelIndex&);
 	void OnSearch();
+
+	void customMenuRequested(QPoint pos);
+	void createActions();
+	void OnAction_export_tag();
+	void OnAction_import_tag();
+	void OnAction_filter_feeder();
+	void OnAction_paint_tag();
+	void OnAction_reset_filter();
 };
 
 extern Idatag_view* myView;
 
-class Idatag_context_disas : public QWidget {
+class Idatag_context_disas : public QDialog {
 	Q_OBJECT
 private:
 	action_activation_ctx_t* ctx;
@@ -79,6 +89,9 @@ private:
 	QLabel* lbl_name;
 	Offset* offset;
 
+	QShortcut* sc_ok;
+	QShortcut* sc_cancel;
+
 public:
 	Idatag_context_disas(action_activation_ctx_t*);
 
@@ -86,7 +99,7 @@ public:
 	void context_menu_pass();
 };
 
-class Idatag_context_func : public QWidget {
+class Idatag_context_func : public QDialog {
 	Q_OBJECT
 private:
 	action_activation_ctx_t* ctx;
@@ -99,6 +112,9 @@ private:
 	QLabel* lbl_selection;
 	QLabel* lbl_name;
 
+	QShortcut* sc_ok;
+	QShortcut* sc_cancel;
+
 public:
 	Idatag_context_func(action_activation_ctx_t*);
 
@@ -106,7 +122,7 @@ public:
 	void context_menu_pass();
 };
 
-class Idatag_context_name : public QWidget {
+class Idatag_context_name : public QDialog {
 	Q_OBJECT
 private:
 	action_activation_ctx_t* ctx;
@@ -118,6 +134,9 @@ private:
 	std::vector<uint64_t> name_selected;
 	QLabel* lbl_selection;
 	QLabel* lbl_name;
+
+	QShortcut* sc_ok;
+	QShortcut* sc_cancel;
 
 public:
 	Idatag_context_name(action_activation_ctx_t*);

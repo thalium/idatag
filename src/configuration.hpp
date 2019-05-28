@@ -13,6 +13,7 @@
 #include <QtWidgets/qlineedit.h>
 #include <QtWidgets/qpushbutton.h>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QDialog>
 
 namespace fs = std::filesystem;
 
@@ -29,8 +30,9 @@ private:
 	std::string username;
 	uint64_t base;
 	int address_width;
+	std::string filename;
 
-	QWidget* menu_configuration;
+	QDialog* menu_configuration;
 	QLabel* menu_lab_path;
 	QLabel* menu_lab_user;
 	QLineEdit* menu_line_path;
@@ -51,7 +53,9 @@ public:
 	void create_menu_configuration();
 	void show_menu_configuration();
 
+	void load_configuration();
 	void refresh_configuration();
+	void set_configuration();
 	void close_configuration();
 
 	std::string get_path_configuration();
@@ -65,6 +69,9 @@ public:
 
 	uint32_t get_address_width_configuration();
 	void set_address_width_configuration(uint32_t);
+
+	void set_filename_configuration(const char* filename);
+	std::string get_filename_configuration();
 };
 
 extern Idatag_configuration* myConfiguration;

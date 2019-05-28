@@ -26,6 +26,7 @@ namespace fs = std::filesystem;
 
 class Tag {
 private:
+	std::string					hash;
 	std::string					label;
 	std::string					type;
 	std::string					signature;
@@ -33,6 +34,7 @@ public:
 	Tag();
 	Tag(std::string&, std::string&);
 	Tag(std::string&, std::string&, std::string&);
+	Tag(std::string&, std::string&, std::string&, std::string&);
 	const std::string get_label() const;
 	const std::string get_type() const;
 	const std::string get_signature() const;
@@ -60,6 +62,7 @@ public:
 	void add_tag(Tag&);
 	const std::vector<Tag> get_tags() const;
 	void remove_tag(std::string&);
+	void remove_all_tags();
 	const uint64_t count_tags() const;
 };
 Q_DECLARE_METATYPE(Offset*)
@@ -85,9 +88,6 @@ public:
 	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-	//bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-	//bool insertRows(int position, int rows, const QModelIndex $index = QModelIndex());
-	//bool removeRows(int position, int rows, const QModelIndex $index = QModelIndex());
 	
 	void add_offset(const uint64_t&);
 	void add_offset(Offset&);
@@ -105,6 +105,8 @@ public:
 	void gather_function_idb();
 	void import_info_disas();
 	
+	bool check_hash_module(const json&);
+
 	void import_feed(const json&, Offset&);
 	void import_feeds(json&);
 	void import_file(const fs::path&);

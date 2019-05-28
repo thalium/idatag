@@ -47,9 +47,9 @@ const std::vector<std::string>& Idatag_model::get_feeders() const
 Qt::ItemFlags Idatag_model::flags(const QModelIndex &index) const 
 {
 	if (index.column() == 2) {
-		return Qt::ItemIsEditable | Qt::ItemIsEnabled;
+		return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 	}
-	return Qt::ItemIsEnabled;
+	return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
 int Idatag_model::rowCount(const QModelIndex &parent) const 
@@ -124,19 +124,19 @@ QVariant Idatag_model::data(const QModelIndex &index, int role) const
 	return QVariant();
 }
 
-//bool Idatag_model::setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) {}
-//bool Idatag_model::insertRows(int position, int rows, const QModelIndex $index = QModelIndex()) {}
-//bool Idatag_model::removeRows(int position, int rows, const QModelIndex $index = QModelIndex()) {}
-
 void Idatag_model::add_offset(const uint64_t& rva) 
 {
 	Offset offset(rva);
+	this->beginInsertRows(QModelIndex(), this->rowCount(), this->rowCount());
 	this->mydata.push_back(offset);
+	this->endInsertRows();
 }
 
 void Idatag_model::add_offset(Offset& offset) 
 {
+	this->beginInsertRows(QModelIndex(), this->rowCount(), this->rowCount());
 	this->mydata.push_back(offset);
+	this->endInsertRows();
 }
 
 Offset* Idatag_model::get_offset_byrva(const uint64_t& rva)
@@ -151,8 +151,8 @@ Offset* Idatag_model::get_offset_byrva(const uint64_t& rva)
 		}
 	}
 
-	Offset offset = Offset(rva);
-	add_offset(offset);
+	Offset* offset = new Offset(rva);
+	add_offset(*offset);
 
 	for (auto& offset_it : this->mydata)
 	{
@@ -195,7 +195,10 @@ QModelIndex Idatag_model::get_index_byrva(const uint64_t& rva)
 }
 
 /*
-void Idatag_model::remove_offset(const uint64_t& rva) FIXME
+	Check if an offset has no name && is not tagged => remove offset
+	/!\ beginRemoveRows (itere through mydata and find index)
+	who does check for this kind of offset?
+void Idatag_model::remove_offset(const uint64_t& rva) 
 {
 	if (!check_rva(rva)) {
 		return;
@@ -204,6 +207,7 @@ void Idatag_model::remove_offset(const uint64_t& rva) FIXME
 	auto it = std::remove_if(mydata.begin(), mydata.end(), [&](Offset offset) {return compare_offset_rva(rva, offset); });
 }
 */
+
 void Idatag_model::add_feeder(std::string& feeder) 
 {
 	auto it = std::find(this->myfeeders.begin(), this->myfeeders.end(), feeder);
@@ -260,8 +264,32 @@ void Idatag_model::import_feed(const json& j_feed, Offset& offset)
 	if (offset.check_already_tagged(label)) return;
 
 	Tag tag = Tag(label, feeder);
+	
 	offset.add_tag(tag);
 	add_feeder(feeder);
+}
+
+bool Idatag_model::check_hash_module(const json& j_feed)
+{
+	uchar u_disas_hash[16];
+	retrieve_input_file_md5(u_disas_hash); 
+	std::string json_hash = j_feed["hash"]; 
+	
+	if (json_hash.empty()) return true;
+
+	char s_disas_hash[3];
+	for (int i = 0; i < 16; i++) 
+	{
+		snprintf(s_disas_hash, 3,"%02X", u_disas_hash[i]);
+		for (int j = 0; j < 2; j++)
+		{
+			if ((int)s_disas_hash[j] != json_hash.c_str()[(2*i) + j])
+			{
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 void Idatag_model::import_feeds(json& j_feeds)
@@ -269,12 +297,17 @@ void Idatag_model::import_feeds(json& j_feeds)
 	try {
 		for (const auto&  it : j_feeds)
 		{
+			if ( (it.find("hash") != it.end()) && !this->check_hash_module(it))
+			{
+				continue;
+			}
+
 			if (!(it["offset"].empty() || it["tag"].empty() || it["feeder"].empty()))
 			{
 				uint64_t rva = it["offset"];
-				Offset* offset = get_offset_byrva(rva);
+				Offset* offset = get_offset_byrva(rva /*+ this->myConfiguration->get_base_configuration()*/);
 				if (offset == NULL) return;
-				
+
 				import_feed(it, *offset);
 			}
 		}
@@ -290,6 +323,7 @@ void Idatag_model::import_file(const fs::path& filepath)
 		std::ifstream ifs(filepath);
 		json j = json::parse(ifs);
 		import_feeds(j);
+		msg("\n[IDATag] Tags imported from %s", filepath.string().c_str());
 	}
 	catch(std::ifstream::failure e){
 		msg("\n[IDATag] Error reading file - %s", e.what());
@@ -306,23 +340,22 @@ void Idatag_model::import_files(const fs::path& path_tags)
 	}
 	catch(fs::filesystem_error& e)
 	{
-		msg("\n[IDATag] Error reading directory - %s", e.what());
+		msg("\n[IDATag] Error finding tag directory - %s", e.what());
 	}
 }
 
 void Idatag_model::import_tags() 
 {
-	char curdir[QMAXPATH];
-	char filename[QMAXPATH];
 	try {
-		qgetcwd(curdir, sizeof(curdir));
-		fs::path current_path = fs::path(curdir);
-		fs::path repository = fs::path("tags");
-		fs::path tag_path = current_path /= repository;
-		get_root_filename(filename, QMAXPATH - 1);
-		fs::path spec_tag_path = tag_path /= filename;
+		std::string spec_tag_path = myConfiguration->get_path_configuration();
+		if (fs::exists(spec_tag_path))
+		{
+			import_files(spec_tag_path);
+		}
 
-		import_files(spec_tag_path);
+		else {
+			msg("\n[IDATag] Default tags directory does'nt exist - %s", spec_tag_path.c_str());
+		}
 	}
 	catch (fs::filesystem_error& e)
 	{
@@ -332,54 +365,49 @@ void Idatag_model::import_tags()
 
 void Idatag_model::export_tags() const
 {
-	try {
-		json jsonArray = json::array();
-		std::ofstream jsonFile;
-		fs::path file;
-		for (const auto & offset : mydata)
+	json jsonArray = json::array();
+	std::ofstream jsonFile;
+	fs::path file;
+
+	for (const auto & offset : mydata)
+	{
+		std::vector<Tag> tags = offset.get_tags();
+		for (const auto & tag : tags)
 		{
-			std::vector<Tag> tags = offset.get_tags();
-			for (const auto & tag : tags)
-			{
-				json jsonTag;
-				
-				jsonTag["offset"] = offset.get_rva();
-				jsonTag["name"] = offset.get_name();
-				jsonTag["tag"] = tag.get_label();
-				jsonTag["feeder"] = tag.get_signature();
-				jsonTag["type"] = tag.get_type();
-
-				jsonArray.push_back(jsonTag);
-			}
+			json jsonTag;
+			
+			jsonTag["offset"] = offset.get_rva();
+			jsonTag["name"] = offset.get_name();
+			jsonTag["tag"] = tag.get_label();
+			jsonTag["feeder"] = tag.get_signature();
+			jsonTag["type"] = tag.get_type();
+			jsonTag["hash"] = tag.get_type();
+			jsonArray.push_back(jsonTag);
 		}
-
-		char curdir[QMAXPATH];
-		char filename[QMAXPATH];
-
-		if (this->myConfiguration->get_path_configuration().empty())
+	}
+	if (this->myConfiguration->get_path_configuration().empty())
+	{
+		msg("[IDATag] Please configure a path to export your tags.");
+	}
+	else 
+	{
+		fs::path tag_path = fs::path(this->myConfiguration->get_path_configuration());
+		if (!fs::exists(tag_path))
 		{
-			qgetcwd(curdir, sizeof(curdir));
-			fs::path current_path = fs::path(curdir);
-			fs::path repository = fs::path("tags");
-			fs::path tag_path = current_path /= repository;
-			get_root_filename(filename, QMAXPATH - 1);
-			fs::path spec_tag_path = tag_path /= filename;
-			spec_tag_path /= filename;
-			fs::path extension = fs::path(".json");
-			file = spec_tag_path += extension;
+			fs::create_directories(tag_path);
 		}
-		else {
-			fs::path tag_path = fs::path(this->myConfiguration->get_path_configuration());
-			get_root_filename(filename, QMAXPATH - 1);
-			fs::path spec_tag_path = tag_path /= filename;
-			spec_tag_path /= filename;
-			fs::path extension = fs::path(".json");
-			file = spec_tag_path += extension;
-		}
+
+		fs::path spec_tag_path = tag_path /= this->myConfiguration->get_filename_configuration();
+		fs::path extension = fs::path(".json");
+		file = spec_tag_path += extension;
+	}
+
+	try 
+	{
 		jsonFile.open(file);
 		jsonFile << jsonArray.dump().c_str();
 		jsonFile.close();
-		msg("\n[IDATag] Tags exported !");
+		msg("\n[IDATag] Tags exported to %s", file.string().c_str());
 	}
 	catch (fs::filesystem_error& e)
 	{
@@ -446,6 +474,11 @@ void Offset::remove_tag(std::string& label)
 	this->tags.erase(it);
 }
 
+void Offset::remove_all_tags()
+{
+	this->tags.clear();
+}
+
 const uint64_t Offset::count_tags() const
 {
 	return this->tags.size();
@@ -477,6 +510,7 @@ Tag::Tag()
 	this->label = "";
 	this->type = "";
 	this->signature = "";
+	this->hash = "";
 }
 
 Tag::Tag(std::string& label, std::string& type, std::string& signature)
@@ -484,6 +518,15 @@ Tag::Tag(std::string& label, std::string& type, std::string& signature)
 	this->label = label;
 	this->type = type;
 	this->signature = signature;
+	this->hash = "";
+}
+
+Tag::Tag(std::string& label, std::string& type, std::string& signature, std::string& hash)
+{
+	this->label = label;
+	this->type = type;
+	this->signature = signature;
+	this->hash = hash;
 }
 
 const std::string Tag::get_label() const 

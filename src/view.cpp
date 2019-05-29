@@ -36,6 +36,8 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 	this->tb->setItemDelegateForColumn(1, delegate_name);
 	this->tb->setItemDelegateForColumn(2, delegate_tag);
 
+	this->tb->setEditTriggers(QAbstractItemView::AnyKeyPressed | QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
+
 	this->hheader = this->tb->horizontalHeader();
 	this->hheader->setSectionsMovable(true);
 	this->hheader->setSectionResizeMode(0, QHeaderView::Interactive);

@@ -186,6 +186,7 @@ void Idatag_delegate_tag::setModelData(QWidget *editor, QAbstractItemModel *mode
 		{
 			QStringList labels = qeditor->text().split(" ", QString::SkipEmptyParts);
 			std::vector<Tag> tags = offset->get_tags();
+			bool changed = false;
 
 			for (auto& tag : tags)
 			{
@@ -203,6 +204,7 @@ void Idatag_delegate_tag::setModelData(QWidget *editor, QAbstractItemModel *mode
 				{
 					std::string lbl_toremove = tag.get_label();
 					offset->remove_tag(lbl_toremove);
+					changed = true;
 				}
 			}
 			for (const auto & qlabel : labels)
@@ -221,15 +223,18 @@ void Idatag_delegate_tag::setModelData(QWidget *editor, QAbstractItemModel *mode
 
 					this->myModel->add_feeder(feeder);
 					this->myModel->add_feeder(autofeed);
+					changed = true;
 				}
 			}
-			std::string user = this->myConfiguration->get_username_configuration();
-			std::string feeder = user;
+			if (changed) {
+				std::string user = this->myConfiguration->get_username_configuration();
+				std::string feeder = user;
 
-			std::string autofeed = "IDATag";
-			Tag tag_user = Tag(this->myConfiguration->get_username_configuration(), autofeed);
-			offset->add_tag(tag_user);
-			this->myModel->add_feeder(autofeed);
+				std::string autofeed = "IDATag";
+				Tag tag_user = Tag(this->myConfiguration->get_username_configuration(), autofeed);
+				offset->add_tag(tag_user);
+				this->myModel->add_feeder(autofeed);
+			}
 		}
 		else
 		{

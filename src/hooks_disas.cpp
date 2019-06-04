@@ -50,12 +50,16 @@ void evt_byte_patched_h(Idatag_hook_idb& myHook_IDB, va_list args)
 void evt_cmt_changed_h(Idatag_hook_idb& myHook_IDB, va_list args)
 {
 	uint64_t ea = va_arg(args, ea_t);
-	std::string new_name = va_arg(args, const char*);
 
 	Offset* offset = myModel->get_offset_byrva(ea);
 	if (offset == NULL) return;
 
 	touch_rva(offset);
+
+	std::string user = myConfiguration->get_username_configuration();
+	std::string label = "commented";
+	Tag tag = Tag(label, user);
+	offset->add_tag(tag);
 }
 
 static ssize_t idaapi idb_evt_h(void* user_data, int notification_code, va_list args)
@@ -206,8 +210,12 @@ Idatag_hook_idp::~Idatag_hook_idp()
 
 void evt_newfile_h(Idatag_hook_idp& myHook_IDP, va_list args)
 {
-	myModel->init_model();
-	myModel->print_stats_model();
+	myModel->export_tags();
+	msg("\n[IDATag] New file event not handled yet.");
+	/* 
+		- Reload configuration
+		- Reload model
+	*/
 }
 
 static ssize_t idaapi idp_evt_h(void* user_data, int notification_code, va_list args)

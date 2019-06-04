@@ -22,6 +22,27 @@
 #include "configuration.hpp"
 #include "delegate.hpp"
 
+class Idatag_table : public QTableView {
+	Q_OBJECT
+
+public:
+	void keyPressEvent(QKeyEvent *);
+};
+
+class Idatag_ledit : public QLineEdit {
+	Q_OBJECT
+
+public:
+	void keyPressEvent(QKeyEvent *);
+};
+
+class Idatag_cbox : public QCheckBox {
+	Q_OBJECT
+
+public:
+	void keyPressEvent(QKeyEvent *);
+};
+
 class Idatag_view : public QWidget{
 	Q_OBJECT
 private:
@@ -29,11 +50,11 @@ private:
 	Idatag_proxy*		myProxy;
 	Idatag_configuration* myConfiguration;
 	QWidget*			parent;
-	QTableView*			tb;
+	Idatag_table*			tb;
 	QHeaderView*		hheader;
 	QHeaderView*		vheader;
-	QCheckBox*			cbox;
-	QLineEdit*			tf;
+	Idatag_cbox*			cbox;
+	Idatag_ledit*			tf;
 	QLabel*				tfl;
 	QShortcut*			sc_filter;
 	QGridLayout*		layout;

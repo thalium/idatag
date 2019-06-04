@@ -6,7 +6,7 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 	this->parent = parent;
 	this->myConfiguration = myConfiguration;
 
-	this->tb = new QTableView();
+	this->tb = new Idatag_table();
 	this->tb->setSortingEnabled(true);
 	this->tb->setShowGrid(false);
 
@@ -49,12 +49,12 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 	this->vheader->setSectionResizeMode(QHeaderView::Fixed);
 	this->vheader->setDefaultSectionSize(24);
 
-	this->cbox = new QCheckBox();
+	this->cbox = new Idatag_cbox();
 	this->cbox->setCheckState(Qt::Checked);
 	this->cbox->setText("Keep tagged offsets only");
 	connect(this->cbox, &QCheckBox::stateChanged, this, &Idatag_view::OnFilter_empty);
 
-	this->tf = new QLineEdit();
+	this->tf = new Idatag_ledit();
 	this->tfl = new QLabel();
 	this->tfl->setText("Search: ");
 	connect(this->tf, &QLineEdit::textChanged, this, &Idatag_view::OnFilter_string);
@@ -83,6 +83,24 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 
 	connect(this->btn_filter_feeder_ok, &QPushButton::clicked, this, &Idatag_view::OnFilter_feeder);
 	connect(this->btn_filter_feeder_cancel, &QPushButton::clicked, this, &Idatag_view::OnFilter_feeder_pass);
+}
+
+void Idatag_table::keyPressEvent(QKeyEvent *event)
+{
+	if (event->key() == Qt::Key_Escape) return;
+	QTableView::keyPressEvent(event);
+}
+
+void Idatag_ledit::keyPressEvent(QKeyEvent *event)
+{
+	if (event->key() == Qt::Key_Escape) return;
+	QLineEdit::keyPressEvent(event);
+}
+
+void Idatag_cbox::keyPressEvent(QKeyEvent *event)
+{
+	if (event->key() == Qt::Key_Escape) return;
+	QCheckBox::keyPressEvent(event);
 }
 
 void Idatag_view::customMenuRequested(QPoint pos)

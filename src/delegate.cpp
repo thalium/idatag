@@ -119,9 +119,6 @@ void Idatag_delegate_tag::drawTag(Tag tag, QPainter *painter, const QStyleOption
 	path.addRoundedRect(QRectF(option.rect.x(), option.rect.y() + 2, width + 20, height), 10, 10);
 	painter->fillPath(path, this->myPalette->get_feeder_colour(tag.get_signature()));
 
-	//qreal topright_y = path.controlPointRect().topRight().y();
-	//path.controlPointRect().topRight().setY(topright_y - 5);
-	//path.controlPointRect().moveTop(topright_y - 44);
 	painter->drawText(path.controlPointRect(), Qt::AlignHCenter | Qt::AlignVCenter, qlabel);
 	painter->setPen(Qt::NoPen);
 	if (filtered)

@@ -2,8 +2,8 @@
 
 #include "QtGui/qcolor.h"
 
-#include <time.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdlib>
 
 class Idatag_palette {
 private:
@@ -12,6 +12,9 @@ private:
 	std::vector<std::string> feeders;
 public:
 	Idatag_palette(const std::vector<std::string>&);
-	void replace_feeder_colour(std::string);
+	void generate_colours(int);
+	void generate_colour();
+	void associate_colours();
+	void associate_colour(std::string);
 	QColor get_feeder_colour(const std::string&);
 };

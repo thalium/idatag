@@ -4,46 +4,73 @@
 Idatag_palette::Idatag_palette(const std::vector<std::string>& feeders)
 {
 	this->feeders = feeders;
-	QColor colour;
-	uint hue = 0;
-	uint saturation = 128;
-	uint value = 180;
-	uint alpha = 255;
 
-	srand(time(NULL));
-	if (feeders.empty())
+	srand(static_cast <unsigned> (time(0)));
+
+	this->generate_colours(32);
+	this->associate_colours();
+}
+
+void Idatag_palette::associate_colours()
+{
+	for (const auto & feeder : this->feeders)
 	{
-
-	}
-	for (const auto & feeder : feeders) {
-		if (hue > 359) {
-			colour = colour.fromHsv(rand() % 359, rand() % 240 + 128, value, alpha);
-			this->association.insert(std::pair<std::string, QColor>(feeder, colour));
-		}
-		else {
-			colour = colour.fromHsv(hue, saturation, value, alpha);
-			this->association.insert(std::pair<std::string, QColor>(feeder, colour));
-			hue += 30;
-		}
+		this->associate_colour(feeder);
 	}
 }
 
-void Idatag_palette::replace_feeder_colour(std::string feeder)
+void Idatag_palette::associate_colour(std::string feeder)
+{
+	uint index;
+	QColor colour;
+	auto it = std::find(this->feeders.begin(), this->feeders.end(), feeder);
+	index = distance(this->feeders.begin(), it);
+
+	if (this->colours.size() >= index)
+	{
+		colour = this->colours[index];
+	}
+	else {
+		do {
+			this->generate_colour();
+		} while (this->colours.size() == (index + 10));
+		colour = this->colours[index];
+	}
+	this->association.insert(std::pair<std::string, QColor>(feeder, colour));
+}
+
+void Idatag_palette::generate_colour()
 {
 	QColor colour;
-	uint value = 180;
-	uint alpha = 255;
-	colour = colour.fromHsv(rand() % 359, rand() % 240 + 128, value, alpha);
-	this->association[feeder] = colour;
-	//this->association.insert(std::pair<std::string, QColor>(feeder, colour));
+	qreal golden_ratio_conjugate = 0.618033988749895;
+	float r;
+	qreal hue;
+
+	r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+
+	hue = r;
+	hue += golden_ratio_conjugate;
+	hue = fmodf(hue, 1.0);
+	colour = colour.fromHsvF(hue, 0.7, 0.7);
+	this->colours.push_back(colour);
+}
+
+void Idatag_palette::generate_colours(int nb_colour)
+{
+	for (int i = 0; i < nb_colour; i++)
+	{
+		this->generate_colour();
+	}
 }
 
 QColor Idatag_palette::get_feeder_colour(const std::string& feeder)
 {
-	QColor color = this->association[feeder];
-	if (color.red() == 0 && color.green() == 0 && color.blue() == 0)
+	if (this->association.find(feeder) == this->association.end())
 	{
-		this->replace_feeder_colour(feeder);
+		this->associate_colour(feeder);
+		return this->association[feeder];
 	}
-	return this->association[feeder];
+	else {
+		return this->association[feeder];
+	}
 }

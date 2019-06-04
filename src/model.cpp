@@ -305,7 +305,7 @@ void Idatag_model::import_feeds(json& j_feeds)
 			if (!(it["offset"].empty() || it["tag"].empty() || it["feeder"].empty()))
 			{
 				uint64_t rva = it["offset"];
-				Offset* offset = get_offset_byrva(rva /*+ this->myConfiguration->get_base_configuration()*/);
+				Offset* offset = get_offset_byrva(rva + this->myConfiguration->get_base_configuration());
 				if (offset == NULL) return;
 
 				import_feed(it, *offset);

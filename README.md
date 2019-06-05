@@ -1,8 +1,11 @@
 # IDATag - Tag explorer for IDA Pro
 
 When analyzing a binary, a reverser using IDA will rename functions, comment, add bookmarks.
+
 Moreover, this actions are available only from the IDA environment (IDA, IDA scripting or plugins).
+
 However, this usage does not allow to have a global view of the analysis. Also, the different conventions to document an IDB may differ.
+
 Finally, adding information from an external tools is not possible (except with scripts or plugins).
 
 The idea behind IDATag is to offer a centralized way/view to document an IDB from IDA or from any other external tool.
@@ -10,11 +13,14 @@ The idea behind IDATag is to offer a centralized way/view to document an IDB fro
 ## Overview
 
 IDATag is a tag plugin for [IDA Pro](https://www.hex-rays.com/products/ida/). The plugin leverages IDA as a platform to map, explore, and visualize collected tags.
+
 Tags can come from multiple sources such as IDA itself or different other clients.
 
 ## Releases
 
 * v0.0.1 -- Initial release
+
+The plugin is in active development, some bugs may appear. Thanks to let me know!
 
 ## Building
 
@@ -56,7 +62,7 @@ cmake --build . --config RelWithDebInfo
 > WARNING: no quotes for the IDASDK path!
 > Example : 
 > ```sh
-> set IDASDK=C:\Program Files\IDA 7.2\idasdk72`
+> set IDASDK=C:\Program Files\IDA 7.2\idasdk72
 > ```
 
 The build binary can be found in `bin\IDATag_x64\` directory:
@@ -85,12 +91,14 @@ IDATag loads automatically when an IDB is opened. To open the view, you may use 
 The Tag Overview is a dockable widget that provides view of the referenced tags. 
 
 These tags can come from multiple entry points:
-* IDB functions
-* IDB names
-* Offsets
+* IDB functions 
+* IDB names 
+* Disassembly 
 * External JSON tag file
 
-The JSON tag file is a pivot to each IDATag client. Every tools that could create a JSON file with a specific structure is able to feed your IDA view. The JSON contract has been designed as minimalist.
+The JSON tag file is a pivot to each IDATag client. 
+
+Every tools that could create a JSON file with a specific structure is able to feed your IDA view. The JSON contract has been designed as minimalist.
 
 For instance, the following JSON is used to tag a specific offset with two tags:
 
@@ -143,6 +151,11 @@ Right clicking the table in the Tag Overview will produce a context menu with a 
 * Reset filters
 * Paint offset (not implemented yet)
 
+Also, IDATag contextual menu is accessible from different views:
+* Functions view
+* Names view
+* Disassembly view
+
 ## Configuration
 
 The plugin can be configured with a specific folder to store tag files and username.
@@ -154,6 +167,8 @@ Multiple hooks have been deployed to automatically tag the database:
 * Patch event
 * Rename event
 * Comment event
+
+Other event might be supported in the near future (eg. new_file).
 
 ## Tag version
 
@@ -167,15 +182,13 @@ This hash value should correspond to the hashsum of the binary.
 		"tag": "crypto",
 		"offset": 5065078,
 		"feeder": "tagcrypt"
+		"feeder": "tagcrypt"
 	}
 ]
 ```
 
 # Tag clients
 
-* Tagcrypt
 * TagAPI
 * TagSource
 * TagString
-* TagRefs
-

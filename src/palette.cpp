@@ -11,6 +11,11 @@ Idatag_palette::Idatag_palette(const std::vector<std::string>& feeders)
 	this->associate_colours();
 }
 
+void Idatag_palette::refresh_feeders(const std::vector<std::string>& feeders)
+{
+	this->feeders = feeders;
+}
+
 void Idatag_palette::associate_colours()
 {
 	for (const auto & feeder : this->feeders)
@@ -33,7 +38,7 @@ void Idatag_palette::associate_colour(std::string feeder)
 	else {
 		do {
 			this->generate_colour();
-		} while (this->colours.size() == (index + 10));
+		} while (this->colours.size() < index);
 		colour = this->colours[index];
 	}
 	this->association.insert(std::pair<std::string, QColor>(feeder, colour));

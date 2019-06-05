@@ -17,4 +17,5 @@ public:
 	void associate_colours();
 	void associate_colour(std::string);
 	QColor get_feeder_colour(const std::string&);
+	void refresh_feeders(const std::vector<std::string>&);
 };

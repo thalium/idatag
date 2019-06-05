@@ -133,6 +133,8 @@ void Idatag_delegate_tag::paint(QPainter *painter, const QStyleOptionViewItem& o
 {
 	if (!index.isValid()) return;
 
+	this->myPalette->refresh_feeders(this->myModel->get_feeders());
+
 	Offset* offset = index.data().value<Offset*>();
 	if (offset != NULL) {
 		

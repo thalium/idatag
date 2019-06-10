@@ -27,3 +27,4 @@ Idatag_view* myView;
 Idatag_hook_idb* myHook_IDB;
 Idatag_hook_ui* myHook_UI;
 Idatag_hook_idp* myHook_IDP;
+Idatag_hook_cview* myHook_CView;

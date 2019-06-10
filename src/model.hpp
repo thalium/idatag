@@ -61,6 +61,7 @@ public:
 
 	void add_tag(Tag&);
 	const std::vector<Tag> get_tags() const;
+	const std::string get_tags_tostr() const;
 	void remove_tag(std::string&);
 	void remove_all_tags();
 	const uint64_t count_tags() const;
@@ -93,6 +94,7 @@ public:
 	void add_offset(Offset&);
 	//void remove_offset(const uint64_t&);
 	Offset* get_offset_byrva(const uint64_t&);
+	Offset* get_offset(const uint64_t&);
 	Offset* get_offset_byindex(int) const ;
 	QModelIndex get_index_byrva(const uint64_t&);
 	bool compare_offset_rva(const uint64_t&, Offset&) const;
@@ -104,6 +106,7 @@ public:
 	void gather_name_idb();
 	void gather_function_idb();
 	void import_info_disas();
+	ea_t is_in_func(ea_t) const;
 	
 	bool check_hash_module(const json&);
 

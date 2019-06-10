@@ -59,6 +59,11 @@ private:
 	QShortcut*			sc_filter;
 	QGridLayout*		layout;
 
+	QLabel*				hfuncl;
+	QLabel*				hoffsetl;
+	QLabel*				funcl;
+	QLabel*				offsetl;
+
 	QWidget* wnd_filter_feeder;
 	QGridLayout* feeder_filter_layout;
 	QVBoxLayout* feeder_layout;
@@ -93,6 +98,8 @@ public:
 	void OnAction_filter_feeder();
 	void OnAction_paint_tag();
 	void OnAction_reset_filter();
+
+	void set_tag_helper(std::string, std::string);
 };
 
 extern Idatag_view* myView;

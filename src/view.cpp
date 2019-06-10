@@ -49,6 +49,17 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 	this->vheader->setSectionResizeMode(QHeaderView::Fixed);
 	this->vheader->setDefaultSectionSize(24);
 
+	this->hfuncl = new QLabel();
+	this->hfuncl->setText("Function tags: ");
+	this->hoffsetl = new QLabel();
+	this->hoffsetl->setText("Offset tags: ");
+	this->funcl = new QLabel();
+	this->funcl->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+	this->funcl->setText("-");
+	this->offsetl = new QLabel();
+	this->offsetl->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+	this->offsetl->setText("-");
+
 	this->cbox = new Idatag_cbox();
 	this->cbox->setCheckState(Qt::Checked);
 	this->cbox->setText("Keep tagged offsets only");
@@ -64,9 +75,13 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 
 	this->layout = new QGridLayout(parent);
 	this->layout->addWidget(this->tb, 0, 0, 1, 0);
-	this->layout->addWidget(this->tfl, 1, 0);
-	this->layout->addWidget(this->tf, 1, 1);
-	this->layout->addWidget(this->cbox, 1, 2);
+	this->layout->addWidget(this->hfuncl, 1, 0);
+	this->layout->addWidget(this->funcl, 1, 1);
+	this->layout->addWidget(this->hoffsetl, 2, 0);
+	this->layout->addWidget(this->offsetl, 2, 1);
+	this->layout->addWidget(this->tfl, 3, 0);
+	this->layout->addWidget(this->tf, 3, 1);
+	this->layout->addWidget(this->cbox, 3, 2);
 
 	connect(this->tb, &QTableView::doubleClicked, this, &Idatag_view::OnNavigate);
 
@@ -289,6 +304,15 @@ void Idatag_view::OnSearch()
 {
 	this->tf->setFocus();
 	this->tf->selectAll();
+}
+
+void Idatag_view::set_tag_helper(std::string tags_off, std::string tags_func)
+{
+	QString qtags_func = QString::fromStdString(tags_func);
+	QString qtags_off = QString::fromStdString(tags_off);
+
+	this->funcl->setText(qtags_func);
+	this->offsetl->setText(qtags_off);
 }
 
 void Idatag_context_disas::context_menu_add_tags()

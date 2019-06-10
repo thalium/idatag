@@ -15,6 +15,7 @@ bool idaapi run(size_t)
 				myHook_IDB = new Idatag_hook_idb();
 				myHook_UI = new Idatag_hook_ui();
 				myHook_IDP = new Idatag_hook_idp();
+				myHook_CView = new Idatag_hook_cview();
 
 				if (myModel == NULL) return true;
 
@@ -77,6 +78,7 @@ void idaapi term(void)
 	if(myHook_IDP != NULL) myHook_IDP->~Idatag_hook_idp();
 	if(myHook_IDB != NULL) myHook_IDB->~Idatag_hook_idb();
 	if(myHook_UI != NULL) myHook_UI->~Idatag_hook_ui();
+	if(myHook_CView != NULL) myHook_CView->~Idatag_hook_cview();
 	
 	if(myConfiguration != NULL) myConfiguration->uninstall_menu_configuration();
 }

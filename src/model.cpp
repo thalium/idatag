@@ -165,6 +165,21 @@ Offset* Idatag_model::get_offset_byrva(const uint64_t& rva)
 	return NULL;
 }
 
+Offset* Idatag_model::get_offset(const uint64_t& rva)
+{
+	if (!check_rva(rva)) return NULL;
+
+	for (auto& offset_it : this->mydata)
+	{
+		if (offset_it.get_rva() == rva)
+		{
+			return &offset_it;
+		}
+	}
+
+	return NULL;
+}
+
 Offset* Idatag_model::get_offset_byindex(int index) const 
 {
 	const Offset* off = &this->mydata[index];
@@ -415,6 +430,16 @@ void Idatag_model::export_tags() const
 	}
 }
 
+ea_t Idatag_model::is_in_func(ea_t ea) const
+{
+	func_t* func;
+	func = get_func(ea);
+
+	if (func == NULL) return -1;
+
+	return func->start_ea;
+}
+
 Offset::Offset()
 {
 	this->rva = 0;
@@ -437,6 +462,17 @@ Offset::Offset(const uint64_t& rva, const std::string& name)
 Offset::Offset(const uint64_t& rva)
 {
 	this->rva = rva;
+}
+
+const std::string Offset::get_tags_tostr() const
+{
+	std::string tagstr;
+	for (const auto & tag : this->tags)
+	{
+		tagstr += tag.get_label();
+		tagstr += " ";
+	}
+	return tagstr;
 }
 
 bool Offset::check_already_tagged(std::string& label) const

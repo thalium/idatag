@@ -231,3 +231,58 @@ static ssize_t idaapi idp_evt_h(void* user_data, int notification_code, va_list 
 	}
 	return 0;
 }
+
+Idatag_hook_cview::Idatag_hook_cview()
+{
+	hook_to_notification_point(HT_VIEW, &cview_evt_h, this);
+}
+
+Idatag_hook_cview::~Idatag_hook_cview()
+{
+	unhook_from_notification_point(HT_VIEW, &cview_evt_h, this);
+}
+
+void evt_view_loc_changed_h(Idatag_hook_cview& myHook_CView, va_list args)
+{
+	TWidget* view = va_arg(args, TWidget*);
+	const lochist_entry_t* now = va_arg(args, const lochist_entry_t *);
+	const lochist_entry_t* was = va_arg(args, const lochist_entry_t *);
+	
+	std::string tags_off = "-";
+	std::string tags_func = "-";
+
+	if (now->plce->toea() != was->plce->toea())
+	{
+		ea_t curea = now->plce->toea();
+		Offset* offset = myModel->get_offset(curea);
+		if (offset != NULL) 
+		{
+			tags_off = offset->get_tags_tostr();
+		}
+
+		ea_t func = myModel->is_in_func(curea);
+		if (func)
+		{
+			Offset* offset_func = myModel->get_offset(func);
+			if (offset_func != NULL)
+			{
+				tags_func = offset_func->get_tags_tostr();
+			}
+		}
+
+		myView->set_tag_helper(tags_off, tags_func);
+	}
+
+}
+
+static ssize_t idaapi cview_evt_h(void* user_data, int notification_code, va_list args)
+{
+	Idatag_hook_cview* myHook_CView = static_cast<Idatag_hook_cview*>(user_data);
+	if (myHook_CView == NULL) return 0;
+
+	switch (notification_code)
+	{
+		case view_notification_t::view_loc_changed: evt_view_loc_changed_h(*myHook_CView, args); break;
+	}
+	return 0;
+}

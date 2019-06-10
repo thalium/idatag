@@ -72,8 +72,7 @@ int idaapi init(void)
 
 void idaapi term(void)
 {
-	msg("\n[IDATag] Unloading plugin. Tags backup in progress...");
-	if(myModel != NULL) myModel->export_tags();
+	msg("\n[IDATag] Unloading plugin.");
 	
 	if(myHook_IDP != NULL) myHook_IDP->~Idatag_hook_idp();
 	if(myHook_IDB != NULL) myHook_IDB->~Idatag_hook_idb();

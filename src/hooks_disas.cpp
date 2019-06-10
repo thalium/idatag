@@ -62,6 +62,20 @@ void evt_cmt_changed_h(Idatag_hook_idb& myHook_IDB, va_list args)
 	offset->add_tag(tag);
 }
 
+void evt_closebase_h(Idatag_hook_idb& myHook_IDB, va_list args)
+{
+	if (myModel == NULL) return;
+	msg("\n[IDATag] Closing base. Exporting tags...");
+	myModel->export_tags();
+}
+
+void evt_savebase_h(Idatag_hook_idb& myHook_IDB, va_list args)
+{
+	if (myModel == NULL) return;
+	msg("\n[IDATag] Saving base. Exporting tags...");
+	myModel->export_tags();
+}
+
 static ssize_t idaapi idb_evt_h(void* user_data, int notification_code, va_list args)
 {
 	Idatag_hook_idb* myHook_IDB = static_cast<Idatag_hook_idb*>(user_data);
@@ -73,6 +87,8 @@ static ssize_t idaapi idb_evt_h(void* user_data, int notification_code, va_list 
 		case idb_event::event_code_t::renamed: evt_rename_h(*myHook_IDB, args); break;
 		case idb_event::event_code_t::byte_patched: evt_byte_patched_h(*myHook_IDB, args); break;
 		case idb_event::event_code_t::cmt_changed: evt_cmt_changed_h(*myHook_IDB, args); break;
+		case idb_event::event_code_t::closebase: evt_closebase_h(*myHook_IDB, args); break;
+		case idb_event::event_code_t::savebase: evt_savebase_h(*myHook_IDB, args); break;
 	}
 	return 0;
 }

@@ -20,6 +20,8 @@ static ssize_t idaapi  idb_evt_h(void*, int, va_list);
 void evt_rename_h(Idatag_hook_idb&, va_list);
 void evt_byte_patched_h(Idatag_hook_idb&, va_list);
 void evt_cmt_changed_h(Idatag_hook_idb&, va_list);
+void evt_closebase_h(Idatag_hook_idb&, va_list);
+void evt_savebase_h(Idatag_hook_idb&, va_list);
 
 
 struct show_context_menu_disas_ah_t : public action_handler_t

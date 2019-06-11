@@ -105,6 +105,24 @@ action_state_t idaapi show_context_menu_disas_ah_t::update(action_update_ctx_t *
 	return AST_ENABLE_ALWAYS;
 }
 
+int idaapi show_context_menu_disas_func_ah_t::activate(action_activation_ctx_t *ctx)
+{
+	Idatag_context_disas_func* context_menu = new Idatag_context_disas_func(ctx);
+	if (myModel->is_in_func(ctx->cur_ea))
+	{
+		context_menu->show();
+	}
+	else {
+		msg("\n[IDATag] Offset not in function. Aborted.");
+	}
+	return 0;
+}
+
+action_state_t idaapi show_context_menu_disas_func_ah_t::update(action_update_ctx_t *)
+{
+	return AST_ENABLE_ALWAYS;
+}
+
 int idaapi show_context_menu_func_ah_t::activate(action_activation_ctx_t *ctx)
 {
 	Idatag_context_func* context_menu = new Idatag_context_func(ctx);
@@ -140,6 +158,17 @@ Idatag_hook_ui::Idatag_hook_ui()
 		NULL,
 		NULL, -1);
 	if (!register_action(desc_disas_menu))
+	{
+		msg("\n[IDATag] Failed to register contextual menu in IDA");
+	}
+
+	this->desc_disas_menu_func = ACTION_DESC_LITERAL(
+		"idatag:context_menu_disas_func",
+		"[IDATag] ~A~dd tags on function",
+		&show_context_disas_menu_func_ah,
+		NULL,
+		NULL, -1);
+	if (!register_action(desc_disas_menu_func))
 	{
 		msg("\n[IDATag] Failed to register contextual menu in IDA");
 	}
@@ -181,6 +210,10 @@ void evt_contextmenu_h(Idatag_hook_ui& myHook_UI, va_list args)
 	case BWN_DISASMS:
 		p = va_arg(args, TPopupMenu *);
 		if (!attach_action_to_popup(f, p, "idatag:context_menu_disas"))
+		{
+			msg("\n[IDATag] Failed to attach contextual menu in IDA");
+		}
+		if (!attach_action_to_popup(f, p, "idatag:context_menu_disas_func"))
 		{
 			msg("\n[IDATag] Failed to attach contextual menu in IDA");
 		}

@@ -153,6 +153,29 @@ public:
 	void context_menu_pass();
 };
 
+class Idatag_context_disas_func : public QDialog {
+	Q_OBJECT
+private:
+	action_activation_ctx_t* ctx;
+	QGridLayout* menu_layout;
+	QPushButton* btn_menu_ok;
+	QPushButton* btn_menu_cancel;
+	QLineEdit* tags_input;
+	uint64_t rva;
+	QLabel* lbl_rva;
+	QLabel* lbl_name;
+	Offset* offset;
+
+	QShortcut* sc_ok;
+	QShortcut* sc_cancel;
+
+public:
+	Idatag_context_disas_func(action_activation_ctx_t*);
+
+	void context_menu_add_tags();
+	void context_menu_pass();
+};
+
 class Idatag_context_func : public QDialog {
 	Q_OBJECT
 private:

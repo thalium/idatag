@@ -742,3 +742,90 @@ void Idatag_context_view::context_menu_pass()
 {
 	this->close();
 }
+
+void Idatag_context_disas_func::context_menu_add_tags()
+{
+	QString qinput = this->tags_input->text();
+	std::string input = qinput.toStdString();
+	this->offset = myModel->get_offset_byrva(this->rva);
+
+	if (this->offset == NULL)
+	{
+		msg("\n[IDATag] Error retrieving referenced offset");
+		this->close();
+	}
+
+	if (input.find_first_not_of(" ") != std::string::npos)
+	{
+		QStringList labels = this->tags_input->text().split(" ");
+		for (const auto & qlabel : labels)
+		{
+			std::string user = myConfiguration->get_username_configuration();
+			std::string feeder = user;
+
+			std::string label = qlabel.toStdString();
+			Tag tag = Tag(label, feeder);
+
+			this->offset->add_tag(tag);
+
+			std::string autofeed = "IDATag";
+			Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+			this->offset->add_tag(tag_user);
+
+			myModel->add_feeder(feeder);
+			myModel->add_feeder(autofeed);
+		}
+	}
+	this->close();
+}
+
+void Idatag_context_disas_func::context_menu_pass()
+{
+	this->close();
+}
+
+Idatag_context_disas_func::Idatag_context_disas_func(action_activation_ctx_t* ctx)
+{
+	this->ctx = ctx;
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->menu_layout = new QGridLayout(this);
+	this->setWindowTitle("[IDATag] Add tags on function...");
+	this->btn_menu_ok = new QPushButton("OK");
+	this->btn_menu_cancel = new QPushButton("Cancel");
+
+	this->setModal(true);
+
+	this->tags_input = new QLineEdit();
+
+	char rva_str[20];
+	this->rva = myModel->is_in_func(ctx->cur_ea);
+	this->offset = myModel->get_offset_byrva(this->rva);
+
+	if (myConfiguration->get_address_width_configuration() == 16)
+	{
+		snprintf(rva_str, 19, "0x%016llX", rva);
+	}
+	else
+	{
+		snprintf(rva_str, 19, "0x%08llX", rva);
+	}
+	this->lbl_rva = new QLabel(rva_str);
+	this->lbl_name = new QLabel(this->offset->get_name().c_str());
+
+	this->menu_layout->addWidget(lbl_rva, 0, 0);
+	this->menu_layout->addWidget(lbl_name, 0, 1);
+
+	this->menu_layout->addWidget(tags_input, 1, 0, 1, 2);
+
+	this->menu_layout->addWidget(btn_menu_ok, 2, 0);
+	this->menu_layout->addWidget(btn_menu_cancel, 2, 1);
+
+	this->connect(btn_menu_ok, &QPushButton::clicked, this, &Idatag_context_disas_func::context_menu_add_tags);
+	this->connect(btn_menu_cancel, &QPushButton::clicked, this, &Idatag_context_disas_func::context_menu_pass);
+
+	this->sc_cancel = new QShortcut(Qt::Key_Escape, this);
+	this->connect(this->sc_cancel, &QShortcut::activated, this, &Idatag_context_disas_func::context_menu_pass);
+
+	this->sc_ok = new QShortcut(Qt::Key_Return, this);
+	this->connect(this->sc_ok, &QShortcut::activated, this, &Idatag_context_disas_func::context_menu_add_tags);
+}

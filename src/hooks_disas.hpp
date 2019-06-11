@@ -30,6 +30,12 @@ struct show_context_menu_disas_ah_t : public action_handler_t
 	virtual action_state_t idaapi update(action_update_ctx_t *);
 };
 
+struct show_context_menu_disas_func_ah_t : public action_handler_t
+{
+	virtual int idaapi activate(action_activation_ctx_t *);
+	virtual action_state_t idaapi update(action_update_ctx_t *);
+};
+
 struct show_context_menu_func_ah_t : public action_handler_t
 {
 	virtual int idaapi activate(action_activation_ctx_t *);
@@ -47,12 +53,14 @@ private:
 	action_desc_t desc_disas_menu;
 	action_desc_t desc_func_menu;
 	action_desc_t desc_name_menu;
+	action_desc_t desc_disas_menu_func;
 
 public:
 	Idatag_hook_ui();
 	~Idatag_hook_ui();
 
 	show_context_menu_disas_ah_t show_context_disas_menu_ah;
+	show_context_menu_disas_func_ah_t show_context_disas_menu_func_ah;
 	show_context_menu_func_ah_t show_context_func_menu_ah;
 	show_context_menu_name_ah_t show_context_name_menu_ah;
 };

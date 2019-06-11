@@ -19,6 +19,7 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 	createActions();
 
 	this->tb->setSelectionBehavior(QAbstractItemView::SelectRows);
+	this->selectionModel = this->tb->selectionModel();
 
 	connect(this->tb, &Idatag_view::customContextMenuRequested, this, &Idatag_view::customMenuRequested);
 
@@ -126,23 +127,23 @@ void Idatag_view::customMenuRequested(QPoint pos)
 
 void Idatag_view::createActions()
 {
+	this->add_tag = new QAction(tr("&Add tags"), this);
+	this->add_tag->setStatusTip(tr("Add tags to offset"));
+	connect(this->add_tag, &QAction::triggered, this, &Idatag_view::OnAction_add_tag);
+
 	this->export_tag = new QAction(tr("&Export tags"), this);
-	this->export_tag->setShortcuts(QKeySequence::SaveAs);
 	this->export_tag->setStatusTip(tr("Export tags to file"));
 	connect(this->export_tag, &QAction::triggered, this, &Idatag_view::OnAction_export_tag);
 
 	this->import_tag = new QAction(tr("&Import tags"), this);
-	this->import_tag->setShortcuts(QKeySequence::Open);
 	this->import_tag->setStatusTip(tr("Import tags from file"));
 	connect(this->import_tag, &QAction::triggered, this, &Idatag_view::OnAction_import_tag);
 
 	this->filter_feeder = new QAction(tr("&Filter by signature"), this);
-	this->filter_feeder->setShortcuts(QKeySequence::Preferences);
 	this->filter_feeder->setStatusTip(tr("Filter tags by signature"));
 	connect(this->filter_feeder, &QAction::triggered, this, &Idatag_view::OnAction_filter_feeder);
 
 	this->paint_tag = new QAction(tr("&Paint offsets"), this);
-	this->paint_tag->setShortcuts(QKeySequence::Refresh);
 	this->paint_tag->setStatusTip(tr("Paint offsets in code"));
 	connect(this->paint_tag, &QAction::triggered, this, &Idatag_view::OnAction_paint_tag);
 
@@ -151,11 +152,31 @@ void Idatag_view::createActions()
 	connect(this->reset_filter, &QAction::triggered, this, &Idatag_view::OnAction_reset_filter);
 
 	this->contextual_menu = new QMenu();
+	this->contextual_menu->addAction(this->add_tag);
 	this->contextual_menu->addAction(this->export_tag);
 	this->contextual_menu->addAction(this->import_tag);
 	this->contextual_menu->addAction(this->filter_feeder);
 	this->contextual_menu->addAction(this->paint_tag);
 	this->contextual_menu->addAction(this->reset_filter);
+}
+
+void Idatag_view::OnAction_add_tag()
+{
+	QModelIndexList indexes_p = this->selectionModel->selectedIndexes();
+	if (indexes_p.empty())
+	{
+		msg("\n[IDATag] No offset selected");
+		return;
+	}
+	
+	QModelIndexList indexes_s;
+	for (const auto& index : indexes_p)
+	{
+		indexes_s.push_back(myProxy->mapToSource(index));
+	}
+
+	this->wnd_context_view = new Idatag_context_view(indexes_s);
+	this->wnd_context_view->show();
 }
 
 void Idatag_view::OnAction_export_tag()
@@ -176,7 +197,7 @@ void Idatag_view::OnAction_filter_feeder()
 
 void Idatag_view::OnAction_paint_tag()
 {
-	msg("\nPaint not yet implemented.");
+	msg("\n[IDATag] Paint not yet implemented.");
 }
 
 void Idatag_view::OnAction_reset_filter()
@@ -618,4 +639,106 @@ Idatag_context_func::Idatag_context_func(action_activation_ctx_t* ctx)
 
 	this->sc_ok = new QShortcut(Qt::Key_Enter, this);
 	this->connect(this->sc_ok, &QShortcut::activated, this, &Idatag_context_func::context_menu_add_tags);
+}
+
+Idatag_context_view::Idatag_context_view(QModelIndexList indexes)
+{
+	this->setAttribute(Qt::WA_DeleteOnClose);
+	this->menu_layout = new QGridLayout(this);
+	this->setWindowTitle("[IDATag] Add tags...");
+	this->btn_menu_ok = new QPushButton("OK");
+	this->btn_menu_cancel = new QPushButton("Cancel");
+	this->tags_input = new QLineEdit();
+	this->setModal(true);
+
+	std::vector<int> rows;
+	QModelIndex idx;
+	for (const auto & index : indexes)
+	{
+		if (std::find(rows.begin(), rows.end(), index.row()) == rows.end())
+		{
+			rows.push_back(index.row());
+		}
+	}
+
+	for (const auto & row : rows)
+	{
+		this->offset_selected.push_back(myModel->get_offset_byindex(row));
+	}
+
+	if (this->offset_selected.size() == 1)
+	{
+		char rva_str[20];
+		if (myConfiguration->get_address_width_configuration() == 16)
+		{
+			snprintf(rva_str, 19, "0x%016llX", this->offset_selected.front()->get_rva());
+		}
+		else
+		{
+			snprintf(rva_str, 19, "0x%08llX", this->offset_selected.front()->get_rva());
+		}
+		this->lbl_rva = new QLabel(rva_str);
+		this->lbl_name = new QLabel(this->offset_selected.front()->get_name().c_str());
+	}
+	else {
+		char off_str[50];
+		snprintf(off_str, 49, "%zu offsets selected", this->offset_selected.size());
+		this->lbl_rva = new QLabel(off_str);
+		this->lbl_name = new QLabel();
+	}
+
+	this->menu_layout->addWidget(lbl_rva, 0, 0);
+	this->menu_layout->addWidget(lbl_name, 0, 1);
+
+	this->menu_layout->addWidget(tags_input, 1, 0, 1, 2);
+
+	this->menu_layout->addWidget(btn_menu_ok, 2, 0);
+	this->menu_layout->addWidget(btn_menu_cancel, 2, 1);
+
+	this->connect(btn_menu_ok, &QPushButton::clicked, this, &Idatag_context_view::context_menu_add_tags);
+	this->connect(btn_menu_cancel, &QPushButton::clicked, this, &Idatag_context_view::context_menu_pass);
+
+	this->sc_cancel = new QShortcut(Qt::Key_Escape, this);
+	this->connect(this->sc_cancel, &QShortcut::activated, this, &Idatag_context_view::context_menu_pass);
+
+	this->sc_ok = new QShortcut(Qt::Key_Enter, this);
+	this->connect(this->sc_ok, &QShortcut::activated, this, &Idatag_context_view::context_menu_add_tags);
+}
+
+void Idatag_context_view::context_menu_add_tags()
+{
+	QString qinput = this->tags_input->text();
+	std::string input = qinput.toStdString();
+
+	if (input.find_first_not_of(" ") != std::string::npos)
+	{
+		for (const auto & offset : this->offset_selected)
+		{
+			QStringList labels = this->tags_input->text().split(" ");
+			for (const auto & qlabel : labels)
+			{
+				std::string user = myConfiguration->get_username_configuration();
+				std::string feeder = user;
+
+				std::string label = qlabel.toStdString();
+				Tag tag = Tag(label, feeder);
+
+				offset->add_tag(tag);
+
+				std::string autofeed = "IDATag";
+				Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+				offset->add_tag(tag_user);
+
+				myModel->add_feeder(feeder);
+				myModel->add_feeder(autofeed);
+			}
+		}
+	}
+	this->close();
+}
+
+
+void Idatag_context_view::context_menu_pass()
+{
+	this->close();
 }

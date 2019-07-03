@@ -18,8 +18,8 @@ Tags can come from multiple sources such as IDA itself or different other client
 
 ## Releases
 
-* v0.0.1 -- Additional interactivity with IDATag from IDA
-* v0.0.1 -- Initial release
+* v0.2 -- Additional interactivity with IDATag from IDA
+* v0.1 -- Initial release
 
 The plugin is in active development, some bugs may appear. Thanks to let me know!
 

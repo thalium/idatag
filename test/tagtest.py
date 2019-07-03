@@ -6,7 +6,7 @@ import string
 import random
 
 PLUGIN_VERSION = "0.0.1"
-AUTHORS = "Arnaud Gatignol @ Thales"
+AUTHORS = "Arnaud Gatignol @ Thalium"
 DATE = "2019"
 
 

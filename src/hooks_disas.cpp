@@ -155,7 +155,7 @@ Idatag_hook_ui::Idatag_hook_ui()
 		"idatag:context_menu_disas",
 		"[IDATag] ~A~dd tags",
 		&show_context_disas_menu_ah,
-		NULL,
+		"Shift+T",
 		NULL, -1);
 	if (!register_action(desc_disas_menu))
 	{

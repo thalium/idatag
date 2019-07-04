@@ -96,6 +96,8 @@ static ssize_t idaapi idb_evt_h(void* user_data, int notification_code, va_list 
 int idaapi show_context_menu_disas_ah_t::activate(action_activation_ctx_t *ctx)
 {
 	Idatag_context_disas* context_menu = new Idatag_context_disas(ctx);
+	if (ctx->cur_ea == BADADDR) return 0;
+	
 	context_menu->show();
 	return 0;
 }

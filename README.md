@@ -27,20 +27,19 @@ The plugin is in active development, some bugs may appear. Thanks to let me know
 
 ### Requirements
 
-* Qt5.3.0 (IDA version)
+* Qt5.6.3 (IDA version)
 * IDA SDK (7.0 and above)
-* MSVC 15.7 (std::filesystem required)
+* std::filesystem required
 
 ### IDA Pro (32-bit)
 
 ```sh
-set IDASDK=C:\Program Files\IDA 7.2\idasdk72
-set IDATARGET=IDA32
-set QTHEADER=C:\Qt\Qt5.3.0\5.3\msvc2013\include
-"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars64.bat"
+set IDASDK=C:\Program Files\IDA 7.3\idasdk73
+set IDATARGET=IDA32WIN
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"
 mkdir Ida32Build
 cd Ida32Build
-cmake -G"Visual Studio 15 2017 Win64" ..
+cmake -G"Visual Studio 16 2019" -A x64 ..
 cmake --build . --config RelWithDebInfo
 ```
 
@@ -50,20 +49,19 @@ The build binary can be found in `bin\IDATag_x64\` directory:
 ### IDA Pro (64-bit)
 
 ```sh
-set IDASDK=C:\Program Files\IDA 7.2\idasdk72
-set IDATARGET=IDA64
-set QTHEADER=C:\Qt\Qt5.3.0\5.3\msvc2013\include
-"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvars64.bat"
+set IDASDK=C:\Program Files\IDA 7.3\idasdk73
+set IDATARGET=IDA64WIN
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"
 mkdir Ida64Build
 cd Ida64Build
-cmake -G"Visual Studio 15 2017 Win64" ..
+cmake -G"Visual Studio 16 2019" -A x64 ..
 cmake --build . --config RelWithDebInfo
 ```
 
 > WARNING: no quotes for the IDASDK path!
 > Example : 
 > ```sh
-> set IDASDK=C:\Program Files\IDA 7.2\idasdk72
+> set IDASDK=C:\Program Files\IDA 7.3\idasdk73
 > ```
 
 The build binary can be found in `bin\IDATag_x64\` directory:

@@ -27,11 +27,22 @@ The plugin is in active development, some bugs may appear. Thanks to let me know
 
 ### Requirements
 
-* Qt5.6.3 (IDA version)
+* Qt 5.6.3 (IDA version)
 * IDA SDK (7.0 and above)
-* std::filesystem required
+* msvc 15.7 or gcc-8 (std::filesystem required)
+* msvc, g++, cmake
+* libgl-dev 
 
 ### IDA Pro (32-bit)
+
+```sh
+export IDASDK=/opt/idafree-7.0/idasdk73
+export IDATARGET=IDA32NUX
+mkdir Ida32Build
+cd Ida32Build
+cmake -G"Unix Makefiles" ..
+make
+```
 
 ```sh
 set IDASDK=C:\Program Files\IDA 7.3\idasdk73
@@ -47,6 +58,15 @@ The build binary can be found in `bin\IDATag_x64\` directory:
 * `IDATag.dll` for IDA Pro 32-bit
 
 ### IDA Pro (64-bit)
+
+```sh
+export IDASDK=/opt/idafree-7.0/idasdk73
+export IDATARGET=IDA64NUX
+mkdir Ida64Build
+cd Ida64Build
+cmake -G"Unix Makefiles" ..
+make
+```
 
 ```sh
 set IDASDK=C:\Program Files\IDA 7.3\idasdk73

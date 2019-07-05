@@ -435,7 +435,7 @@ ea_t Idatag_model::is_in_func(ea_t ea) const
 	func_t* func;
 	func = get_func(ea);
 
-	if (func == NULL) return -1;
+	if (func == NULL) return BADADDR;
 
 	return func->start_ea;
 }
@@ -462,6 +462,7 @@ Offset::Offset(const uint64_t& rva, const std::string& name)
 Offset::Offset(const uint64_t& rva)
 {
 	this->rva = rva;
+	this->name = "";
 }
 
 const std::string Offset::get_tags_tostr() const

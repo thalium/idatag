@@ -110,7 +110,7 @@ action_state_t idaapi show_context_menu_disas_ah_t::update(action_update_ctx_t *
 int idaapi show_context_menu_disas_func_ah_t::activate(action_activation_ctx_t *ctx)
 {
 	Idatag_context_disas_func* context_menu = new Idatag_context_disas_func(ctx);
-	if (myModel->is_in_func(ctx->cur_ea))
+	if (myModel->is_in_func(ctx->cur_ea) != BADADDR)
 	{
 		context_menu->show();
 	}
@@ -312,7 +312,7 @@ void evt_view_loc_changed_h(Idatag_hook_cview& myHook_CView, va_list args)
 		}
 
 		ea_t func = myModel->is_in_func(curea);
-		if (func)
+		if (func != BADADDR)
 		{
 			Offset* offset_func = myModel->get_offset(func);
 			if (offset_func != NULL)

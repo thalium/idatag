@@ -799,7 +799,10 @@ Idatag_context_disas_func::Idatag_context_disas_func(action_activation_ctx_t* ct
 
 	char rva_str[20];
 	this->rva = myModel->is_in_func(ctx->cur_ea);
+	if (this->rva == BADADDR) return;
+
 	this->offset = myModel->get_offset_byrva(this->rva);
+	if (this->offset == NULL) return;
 
 	if (myConfiguration->get_address_width_configuration() == 16)
 	{
@@ -810,7 +813,11 @@ Idatag_context_disas_func::Idatag_context_disas_func(action_activation_ctx_t* ct
 		snprintf(rva_str, 19, "0x%08llX", rva);
 	}
 	this->lbl_rva = new QLabel(rva_str);
-	this->lbl_name = new QLabel(this->offset->get_name().c_str());
+	std::string sname = this->offset->get_name();
+	if (sname.empty()) sname = "";
+	else {
+		this->lbl_name = new QLabel(sname.c_str());
+	}
 
 	this->menu_layout->addWidget(lbl_rva, 0, 0);
 	this->menu_layout->addWidget(lbl_name, 0, 1);

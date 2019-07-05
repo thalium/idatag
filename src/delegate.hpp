@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QtWidgets/qstyleditemdelegate.h>
-#include <QtWidgets/qwidget.h>
-#include <QtGui/qpainter.h>
-#include <QtCore/qmetatype.h>
-#include <QtWidgets/qlistwidget.h>
+#include <QtWidgets/QStyledItemDelegate>
+#include <QtWidgets/QWidget>
+#include <QtGui/QPainter>
+#include <QtCore/QMetaType>
+#include <QtWidgets/QListWidget>
 
 #include "model.hpp"
 #include "view.hpp"

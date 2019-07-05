@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QtGui/qcolor.h"
+#include "QtGui/QColor"
 
 #include <ctime>
 #include <cstdlib>

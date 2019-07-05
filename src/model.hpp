@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtCore/QAbstractItemModel>
-#include <QtCore/qobject.h>
+#include <QtCore/QObject>
 
 #include <ida.hpp>
 #include <loader.hpp>

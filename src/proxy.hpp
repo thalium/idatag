@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore\qsortfilterproxymodel.h>
+#include <QtCore/QSortFilterProxyModel>
 #include <QtCore/Qt>
 
 #include "model.hpp"

@@ -4,6 +4,8 @@
 
 #include <ctime>
 #include <cstdlib>
+#include <map>
+#include <vector>
 
 class Idatag_palette {
 private:

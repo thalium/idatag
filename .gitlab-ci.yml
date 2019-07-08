@@ -66,10 +66,10 @@ deploy:
     - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%
     - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64
     
-    - xcopy "%CI_PROJECT_DIR%\bin\IDATag64.dll" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
-    - xcopy "%CI_PROJECT_DIR%\bin\IDATag64.dll" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
-    - xcopy "%CI_PROJECT_DIR%\bin\IDATag.dll" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
-    - xcopy "%CI_PROJECT_DIR%\bin\IDATag.dll" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\Ida64Build\bin\IDATag64.dll" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\Ida64Build\bin\IDATag64.dll" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\Ida32Build\bin\IDATag.dll" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\Ida32Build\bin\IDATag.dll" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
       
   artifacts:
     name: "%CI_PROJECT_NAME%-%CI_COMMIT_SHA%"

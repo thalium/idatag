@@ -498,11 +498,11 @@ Idatag_context_name::Idatag_context_name(action_activation_ctx_t* ctx)
 		char rva_str[20];
 		if (myConfiguration->get_address_width_configuration() == 16)
 		{
-			snprintf(rva_str, 19, "0x%016llX", this->name_selected.front());
+			snprintf(rva_str, 19, "0x%016llX", (unsigned long long)this->name_selected.front());
 		}
 		else
 		{
-			snprintf(rva_str, 19, "0x%08llX", this->name_selected.front());
+			snprintf(rva_str, 19, "0x%08llX", (unsigned long long)this->name_selected.front());
 		}
 		this->lbl_rva = new QLabel(rva_str);
 
@@ -603,11 +603,11 @@ Idatag_context_func::Idatag_context_func(action_activation_ctx_t* ctx)
 		char rva_str[20];
 		if (myConfiguration->get_address_width_configuration() == 16)
 		{
-			snprintf(rva_str, 19, "0x%016llX", this->func_selected.front()->start_ea);
+			snprintf(rva_str, 19, "0x%016llX", (unsigned long long)this->func_selected.front()->start_ea);
 		}
 		else
 		{
-			snprintf(rva_str, 19, "0x%08llX", this->func_selected.front()->start_ea);
+			snprintf(rva_str, 19, "0x%08llX", (unsigned long long)this->func_selected.front()->start_ea);
 		}
 		this->lbl_rva = new QLabel(rva_str);
 
@@ -670,11 +670,11 @@ Idatag_context_view::Idatag_context_view(QModelIndexList indexes)
 		char rva_str[20];
 		if (myConfiguration->get_address_width_configuration() == 16)
 		{
-			snprintf(rva_str, 19, "0x%016llX", this->offset_selected.front()->get_rva());
+			snprintf(rva_str, 19, "0x%016llX", (unsigned long long)this->offset_selected.front()->get_rva());
 		}
 		else
 		{
-			snprintf(rva_str, 19, "0x%08llX", this->offset_selected.front()->get_rva());
+			snprintf(rva_str, 19, "0x%08llX", (unsigned long long)this->offset_selected.front()->get_rva());
 		}
 		this->lbl_rva = new QLabel(rva_str);
 		this->lbl_name = new QLabel(this->offset_selected.front()->get_name().c_str());

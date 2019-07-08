@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <map>
 #include <vector>
+#include <cmath>
 
 class Idatag_palette {
 private:

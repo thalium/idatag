@@ -19,11 +19,11 @@ void Idatag_delegate_rva::paint(QPainter *painter, const QStyleOptionViewItem& o
 		uint64_t rva = qvariant_cast<uint64_t>(index.data());
 		if (this->myConfiguration->get_address_width_configuration() == 16)
 		{
-			snprintf(rva_str, 19, "0x%016llX", rva);
+			snprintf(rva_str, 19, "0x%016llX", (unsigned long long)rva);
 		}
 		else
 		{
-			snprintf(rva_str, 19, "0x%08llX", rva);
+			snprintf(rva_str, 19, "0x%08llX", (unsigned long long)rva);
 		}
 
 		painter->save();

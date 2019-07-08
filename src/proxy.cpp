@@ -34,7 +34,7 @@ bool Idatag_proxy::filter_string(int source_row, const QModelIndex& source_paren
 	if (offset->get_name().find(str_filter) != std::string::npos) return true;
 
 	char rva_c[20];
-	snprintf(rva_c, 19, "0x%016llX", offset->get_rva());
+	snprintf(rva_c, 19, "0x%016llX", (unsigned long long)offset->get_rva());
 	std::string rva_str(rva_c);
 	if (rva_str.find(str_filter) != std::string::npos) return true;
 

@@ -70,6 +70,6 @@ private:
 	bool lock;
 public:
 	Idatag_editor(QWidget*);
-	void Idatag_editor::OnEdit();
+	void OnEdit();
 	void locker();
 };

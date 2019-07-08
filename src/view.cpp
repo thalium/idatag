@@ -351,18 +351,17 @@ void Idatag_context_disas::context_menu_add_tags()
 	if (input.find_first_not_of(" ") != std::string::npos)
 	{
 		QStringList labels = this->tags_input->text().split(" ");
+		std::string user = myConfiguration->get_username_configuration();
+		std::string feeder = user;
 		for (const auto & qlabel : labels)
 		{
-			std::string user = myConfiguration->get_username_configuration();
-			std::string feeder = user;
-
 			std::string label = qlabel.toStdString();
 			Tag tag = Tag(label, feeder);
 			
 			this->offset->add_tag(tag);
 
 			std::string autofeed = "IDATag";
-			Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+			Tag tag_user = Tag(user, autofeed);
 			this->offset->add_tag(tag_user);
 
 			myModel->add_feeder(feeder);
@@ -394,11 +393,11 @@ Idatag_context_disas::Idatag_context_disas(action_activation_ctx_t* ctx)
 	this->rva = ctx->cur_ea;
 	if (myConfiguration->get_address_width_configuration() == 16)
 	{
-		snprintf(rva_str, 19, "0x%016llX", rva);
+		snprintf(rva_str, 19, "0x%016llX", (unsigned long long)rva);
 	}
 	else
 	{
-		snprintf(rva_str, 19, "0x%08llX", rva);
+		snprintf(rva_str, 19, "0x%08llX", (unsigned long long)rva);
 	}
 	this->lbl_rva = new QLabel(rva_str);
 	
@@ -437,6 +436,8 @@ void Idatag_context_name::context_menu_add_tags()
 
 	if (input.find_first_not_of(" ") != std::string::npos)
 	{
+		std::string user = myConfiguration->get_username_configuration();
+		std::string feeder = user;
 		for (const auto & name : this->name_selected) {
 			Offset* offset = myModel->get_offset_byrva(name);
 
@@ -449,8 +450,6 @@ void Idatag_context_name::context_menu_add_tags()
 			QStringList labels = this->tags_input->text().split(" ");
 			for (const auto & qlabel : labels)
 			{
-				std::string user = myConfiguration->get_username_configuration();
-				std::string feeder = user;
 
 				std::string label = qlabel.toStdString();
 				Tag tag = Tag(label, feeder);
@@ -458,7 +457,7 @@ void Idatag_context_name::context_menu_add_tags()
 				offset->add_tag(tag);
 
 				std::string autofeed = "IDATag";
-				Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+				Tag tag_user = Tag(user, autofeed);
 				offset->add_tag(tag_user);
 
 				myModel->add_feeder(feeder);
@@ -542,6 +541,8 @@ void Idatag_context_func::context_menu_add_tags()
 
 	if (input.find_first_not_of(" ") != std::string::npos)
 	{
+		std::string user = myConfiguration->get_username_configuration();
+		std::string feeder = user;
 		for (const auto & func : this->func_selected) {
 			Offset* offset = myModel->get_offset_byrva(func->start_ea);
 
@@ -554,8 +555,6 @@ void Idatag_context_func::context_menu_add_tags()
 			QStringList labels = this->tags_input->text().split(" ");
 			for (const auto & qlabel : labels)
 			{
-				std::string user = myConfiguration->get_username_configuration();
-				std::string feeder = user;
 
 				std::string label = qlabel.toStdString();
 				Tag tag = Tag(label, feeder);
@@ -563,7 +562,7 @@ void Idatag_context_func::context_menu_add_tags()
 				offset->add_tag(tag);
 
 				std::string autofeed = "IDATag";
-				Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+				Tag tag_user = Tag(user, autofeed);
 				offset->add_tag(tag_user);
 
 				myModel->add_feeder(feeder);
@@ -712,21 +711,20 @@ void Idatag_context_view::context_menu_add_tags()
 
 	if (input.find_first_not_of(" ") != std::string::npos)
 	{
+		std::string user = myConfiguration->get_username_configuration();
+		std::string feeder = user;
 		for (const auto & offset : this->offset_selected)
 		{
 			QStringList labels = this->tags_input->text().split(" ");
 			for (const auto & qlabel : labels)
 			{
-				std::string user = myConfiguration->get_username_configuration();
-				std::string feeder = user;
-
 				std::string label = qlabel.toStdString();
 				Tag tag = Tag(label, feeder);
 
 				offset->add_tag(tag);
 
 				std::string autofeed = "IDATag";
-				Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+				Tag tag_user = Tag(user, autofeed);
 				offset->add_tag(tag_user);
 
 				myModel->add_feeder(feeder);
@@ -758,18 +756,17 @@ void Idatag_context_disas_func::context_menu_add_tags()
 	if (input.find_first_not_of(" ") != std::string::npos)
 	{
 		QStringList labels = this->tags_input->text().split(" ");
+		std::string user = myConfiguration->get_username_configuration();
+		std::string feeder = user;
 		for (const auto & qlabel : labels)
 		{
-			std::string user = myConfiguration->get_username_configuration();
-			std::string feeder = user;
-
 			std::string label = qlabel.toStdString();
 			Tag tag = Tag(label, feeder);
 
 			this->offset->add_tag(tag);
 
 			std::string autofeed = "IDATag";
-			Tag tag_user = Tag(myConfiguration->get_username_configuration(), autofeed);
+			Tag tag_user = Tag(user, autofeed);
 			this->offset->add_tag(tag_user);
 
 			myModel->add_feeder(feeder);
@@ -806,11 +803,11 @@ Idatag_context_disas_func::Idatag_context_disas_func(action_activation_ctx_t* ct
 
 	if (myConfiguration->get_address_width_configuration() == 16)
 	{
-		snprintf(rva_str, 19, "0x%016llX", rva);
+		snprintf(rva_str, 19, "0x%016llX", (unsigned long long)rva);
 	}
 	else
 	{
-		snprintf(rva_str, 19, "0x%08llX", rva);
+		snprintf(rva_str, 19, "0x%08llX", (unsigned long long)rva);
 	}
 	this->lbl_rva = new QLabel(rva_str);
 	std::string sname = this->offset->get_name();

@@ -29,8 +29,8 @@ const int Idatag_model::count_stats_tags() const
 
 void Idatag_model::print_stats_model() 
 {
-	size_t nb_tags = count_stats_tags();
-	size_t nb_offsets = this->mydata.size();
+	int nb_tags = count_stats_tags();
+	int nb_offsets = this->mydata.size();
 	msg("\n[IDATag] Tags : %d on %d offsets!\n", nb_tags, nb_offsets);
 }
 
@@ -112,7 +112,7 @@ QVariant Idatag_model::data(const QModelIndex &index, int role) const
 	switch(column) 
 	{
 		case 0:
-			return offset->get_rva();
+			return QVariant((unsigned long long)offset->get_rva());
 		case 1:
 			name = offset->get_name();
 			qname = QString::fromStdString(name);

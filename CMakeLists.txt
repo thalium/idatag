@@ -18,7 +18,9 @@ set(CMAKE_AUTOMOC ON)
 if("$ENV{IDATARGET}" STREQUAL "IDA64WIN" OR "$ENV{IDATARGET}" STREQUAL "IDA32WIN")
 	set(CMAKE_PREFIX_PATH "C:\\Qt\\Qt5.6.3\\5.6.3\\msvc2015_64")
 elseif("$ENV{IDATARGET}" STREQUAL "IDA64NUX" OR "$ENV{IDATARGET}" STREQUAL "IDA32NUX")
-	set(CMAKE_PREFIX_PATH "test_linux")
+	set(CMAKE_PREFIX_PATH "/opt/Qt/5.6.3/gcc_64")
+	set(CMAKE_C_COMPILER /usr/bin/gcc-8)
+	set(CMAKE_CXX_COMPILER /usr/bin/g++-8)
 endif()
 
 find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
@@ -106,5 +108,48 @@ elseif("$ENV{IDATARGET}" STREQUAL "IDA32WIN")
 	# C4267 : IDA SDK => conversion size_t to int (pro.h)
 	# C4244 : IDA SDK => conversion size_t to int (idp.hpp)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/wd4267 /wd4244")
+
+
+elseif("$ENV{IDATARGET}" STREQUAL "IDA32NUX")
+	target_compile_definitions(${PROJECT_NAME} PRIVATE 
+		__LINUX__
+		__IDP__
+		__X64__
+		USE_DANGEROUS_FUNCTIONS
+		USE_STANDARD_FILE_FUNCTIONS
+		__QT__
+		QT_NAMESPACE=QT
+	)
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		"${IDASDK}/lib/x64_linux_gcc_32/libida.so"
+		"${IDASDK}/../libQt5Core.so.5"
+		"${IDASDK}/../libQt5Widgets.so.5"
+		"${IDASDK}/../libQt5Gui.so.5"
+	)
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		stdc++fs
+	)
+
+elseif("$ENV{IDATARGET}" STREQUAL "IDA64NUX")
+	target_compile_definitions(${PROJECT_NAME} PRIVATE 
+		__LINUX__
+		__IDP__
+		__X64__
+		__EA64__
+		USE_DANGEROUS_FUNCTIONS
+		USE_STANDARD_FILE_FUNCTIONS
+		__QT__
+		QT_NAMESPACE=QT
+	)
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		"${IDASDK}/lib/x64_linux_gcc_64/libida64.so"
+		"${IDASDK}/../libQt5Core.so.5"
+		"${IDASDK}/../libQt5Widgets.so.5"
+		"${IDASDK}/../libQt5Gui.so.5"
+	)
+	set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX "64.so")
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		stdc++fs
+	)
 
 endif()

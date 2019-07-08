@@ -18,6 +18,7 @@ Tags can come from multiple sources such as IDA itself or different other client
 
 ## Releases
 
+* v0.3 -- Build on Linux, SDK IDA 7.3 , bug fix 
 * v0.2 -- Additional interactivity with IDATag from IDA
 * v0.1 -- Initial release
 

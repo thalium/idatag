@@ -45,7 +45,7 @@ make
 ```
 
 ```sh
-set IDASDK=C:\Program Files\IDA 7.3\idasdk73
+set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
 set IDATARGET=IDA32WIN
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"
 mkdir Ida32Build
@@ -69,7 +69,7 @@ make
 ```
 
 ```sh
-set IDASDK=C:\Program Files\IDA 7.3\idasdk73
+set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
 set IDATARGET=IDA64WIN
 "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"
 mkdir Ida64Build
@@ -81,7 +81,7 @@ cmake --build . --config RelWithDebInfo
 > WARNING: no quotes for the IDASDK path!
 > Example : 
 > ```sh
-> set IDASDK=C:\Program Files\IDA 7.3\idasdk73
+> set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
 > ```
 
 The build binary can be found in `bin\IDATag_x64\` directory:

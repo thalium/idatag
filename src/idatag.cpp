@@ -47,7 +47,7 @@ bool idaapi run(size_t)
 
 		myView = new Idatag_view((QWidget *)ida_widget, myModel, myConfiguration);
 		if (myView == NULL) return false;
-		display_widget(ida_widget, WOPN_TAB);
+		display_widget(ida_widget, WOPN_DP_TAB);
 	}
 	else
 	{

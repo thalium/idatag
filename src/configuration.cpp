@@ -17,7 +17,7 @@ Idatag_configuration::Idatag_configuration()
 	this->username = std::string("User");
 	this->base = get_imagebase();
 	
-	if (inf.is_64bit()) {
+	if (inf_is_64bit()) {
 		this->address_width = 16;
 	}
 	else this->address_width = 8;

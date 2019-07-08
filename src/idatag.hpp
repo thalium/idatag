@@ -11,7 +11,7 @@
 #include "configuration.hpp"
 #include "hooks_disas.hpp"
 
-constexpr const char * version = "0.0.1";
+constexpr const char * version = "0.3";
 constexpr const char* authors = "Arnaud Gatignol @ Thalium";
 constexpr const char* date = "2019";
 constexpr const char* name = "IDATag";

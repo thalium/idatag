@@ -49,12 +49,10 @@ private:
 	Idatag_palette* myPalette;
 	Idatag_proxy* myProxy;
 	QWidget* parent;
-	Idatag_view* g_myView;
-	QTableView* myView;
 	Idatag_configuration* myConfiguration;
 
 public:
-	Idatag_delegate_tag(QWidget*, Idatag_model*, Idatag_view*, Idatag_configuration*, Idatag_proxy*);
+	Idatag_delegate_tag(QWidget*, Idatag_model*, Idatag_configuration*, Idatag_proxy*);
 	QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 	void paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;

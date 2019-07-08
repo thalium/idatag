@@ -74,7 +74,7 @@ void Idatag_delegate_name::paint(QPainter *painter, const QStyleOptionViewItem& 
 	}
 }
 
-Idatag_delegate_tag::Idatag_delegate_tag(QWidget* parent, Idatag_model* myModel, Idatag_view* g_myView, Idatag_configuration* myConfiguration, Idatag_proxy* myProxy) :
+Idatag_delegate_tag::Idatag_delegate_tag(QWidget* parent, Idatag_model* myModel, Idatag_configuration* myConfiguration, Idatag_proxy* myProxy) :
 	QStyledItemDelegate()
 {
 	this->parent = parent;

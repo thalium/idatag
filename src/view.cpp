@@ -31,7 +31,7 @@ Idatag_view::Idatag_view(QWidget* parent, Idatag_model* myModel, Idatag_configur
 
 	Idatag_delegate_rva* delegate_rva = new Idatag_delegate_rva(this->parent, this->myModel, this->myConfiguration);
 	Idatag_delegate_name* delegate_name = new Idatag_delegate_name(this->parent, this->myModel, this->myConfiguration);
-	Idatag_delegate_tag* delegate_tag = new Idatag_delegate_tag(this->parent, this->myModel, this, this->myConfiguration, this->myProxy);
+	Idatag_delegate_tag* delegate_tag = new Idatag_delegate_tag(this->parent, this->myModel, this->myConfiguration, this->myProxy);
 
 	this->tb->setItemDelegateForColumn(0, delegate_rva);
 	this->tb->setItemDelegateForColumn(1, delegate_name);

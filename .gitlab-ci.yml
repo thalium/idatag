@@ -28,7 +28,7 @@ Ida32Build:
   artifacts:
     name: "%CI_PROJECT_NAME%_%CI_JOB_NAME%-%CI_COMMIT_SHA%"
     paths:
-        - .\bin\IDATag.dll
+        - ./bin/IDATag.dll
         
 Ida64Build:
   stage: build
@@ -50,7 +50,7 @@ Ida64Build:
   artifacts:
     name: "%CI_PROJECT_NAME%_%CI_JOB_NAME%-%CI_COMMIT_SHA%"
     paths:
-        - .\bin\IDATag64.dll
+        - ./bin/IDATag64.dll
             
 deploy:
   stage: deploy
@@ -66,12 +66,14 @@ deploy:
     - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%
     - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64
     
-    - xcopy "%CI_PROJECT_DIR%\bin\IDATag_x64" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
-    - xcopy "%CI_PROJECT_DIR%\bin\IDATag_x64" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\bin\IDATag64.dll" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\bin\IDATag64.dll" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\bin\IDATag.dll" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\bin\IDATag.dll" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
       
   artifacts:
     name: "%CI_PROJECT_NAME%-%CI_COMMIT_SHA%"
     paths:
-      - ./bin/IDATag_x64
+      - ./bin
 
     

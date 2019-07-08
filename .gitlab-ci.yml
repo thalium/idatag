@@ -1,0 +1,77 @@
+before_script:
+  - echo "Starting build for %CI_PROJECT_NAME%"
+  
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+ 
+stages:
+  - build
+  - deploy
+
+Ida32Build:
+  stage: build
+  tags:
+    - msvc2019
+    - qt
+    - ida
+  script:
+    - echo "  --> IDA Pro (32-bit) version..."
+    - '%comspec% /k "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"'
+    - cd %CI_PROJECT_DIR%
+    - if not exist "Ida32Build" mkdir Ida32Build
+    - cd Ida32Build
+    - set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
+    - set IDATARGET=IDA32WIN
+    - cmake -G"Visual Studio 16 2019" -A x64 ..
+    - cmake --build . --config RelWithDebInfo
+
+  artifacts:
+    name: "%CI_PROJECT_NAME%_%CI_JOB_NAME%-%CI_COMMIT_SHA%"
+    paths:
+        - ./bin
+        
+Ida64Build:
+  stage: build
+  tags:
+    - msvc2019
+    - qt
+    - ida
+  script:
+    - echo "  --> IDA Pro (64-bit) version..."
+    - '%comspec% /k "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvars64.bat"'
+    - cd %CI_PROJECT_DIR%
+    - if not exist "Ida64Build" mkdir Ida64Build
+    - cd Ida64Build
+    - set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
+    - set IDATARGET=IDA64WIN
+    - cmake -G"Visual Studio 16 2019" -A x64 ..
+    - cmake --build . --config RelWithDebInfo
+
+  artifacts:
+    name: "%CI_PROJECT_NAME%_%CI_JOB_NAME%-%CI_COMMIT_SHA%"
+    paths:
+        - ./bin
+            
+deploy:
+  stage: deploy
+  dependencies:
+    - Ida32Build
+    - Ida64Build
+  before_script:
+    - if not exist "N:" net use /Y "N:" \\filer.lci.re\data\nfs
+  script:
+    - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%" mkdir N:\binaries\Git\%CI_PROJECT_NAME%
+    - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\_latest" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\_latest
+    - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64
+    - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%
+    - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64
+    
+    - xcopy "%CI_PROJECT_DIR%\bin\IDATag_x64" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
+    - xcopy "%CI_PROJECT_DIR%\bin\IDATag_x64" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
+      
+  artifacts:
+    name: "%CI_PROJECT_NAME%-%CI_COMMIT_SHA%"
+    paths:
+      - ./bin/IDATag_x64
+
+    

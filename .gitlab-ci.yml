@@ -28,7 +28,7 @@ Ida32Build:
   artifacts:
     name: "%CI_PROJECT_NAME%_%CI_JOB_NAME%-%CI_COMMIT_SHA%"
     paths:
-        - ./bin/IDATag.dll
+        - ./Ida32Build/bin/IDATag.dll
         
 Ida64Build:
   stage: build
@@ -50,7 +50,7 @@ Ida64Build:
   artifacts:
     name: "%CI_PROJECT_NAME%_%CI_JOB_NAME%-%CI_COMMIT_SHA%"
     paths:
-        - ./bin/IDATag64.dll
+        - ./Ida64Build/bin/IDATag64.dll
             
 deploy:
   stage: deploy
@@ -74,6 +74,6 @@ deploy:
   artifacts:
     name: "%CI_PROJECT_NAME%-%CI_COMMIT_SHA%"
     paths:
-      - ./bin
+      - ./
 
     

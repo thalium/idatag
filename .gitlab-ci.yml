@@ -66,6 +66,10 @@ deploy:
     - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%
     - if not exist "N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64" mkdir N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64
     
+    - if not exist "%CI_PROJECT_DIR%\bin" mkdir "%CI_PROJECT_DIR%\bin"
+    - xcopy "%CI_PROJECT_DIR%\Ida64Build\bin\IDATag64.dll" "%CI_PROJECT_DIR%\bin" /Y
+    - xcopy "%CI_PROJECT_DIR%\Ida32Build\bin\IDATag.dll" "%CI_PROJECT_DIR%\bin" /Y
+    
     - xcopy "%CI_PROJECT_DIR%\Ida64Build\bin\IDATag64.dll" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
     - xcopy "%CI_PROJECT_DIR%\Ida64Build\bin\IDATag64.dll" N:\binaries\Git\%CI_PROJECT_NAME%\%CI_COMMIT_SHA%\x64 /Y
     - xcopy "%CI_PROJECT_DIR%\Ida32Build\bin\IDATag.dll" N:\binaries\Git\%CI_PROJECT_NAME%\_latest\x64 /Y
@@ -74,6 +78,6 @@ deploy:
   artifacts:
     name: "%CI_PROJECT_NAME%-%CI_COMMIT_SHA%"
     paths:
-      - ./
+      - ./bin
 
     

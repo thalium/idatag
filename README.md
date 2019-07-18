@@ -36,6 +36,8 @@ The plugin is in active development, some bugs may appear. Thanks to let me know
 
 ### IDA Pro (32-bit)
 
+#### Linux
+
 ```sh
 export IDASDK=/opt/idafree-7.0/idasdk73
 export IDATARGET=IDA32NUX
@@ -44,6 +46,7 @@ cd Ida32Build
 cmake -G"Unix Makefiles" ..
 make
 ```
+#### Windows
 
 ```sh
 set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
@@ -60,6 +63,8 @@ The build binary can be found in `bin\IDATag_x64\` directory:
 
 ### IDA Pro (64-bit)
 
+#### Linux
+
 ```sh
 export IDASDK=/opt/idafree-7.0/idasdk73
 export IDATARGET=IDA64NUX
@@ -68,6 +73,7 @@ cd Ida64Build
 cmake -G"Unix Makefiles" ..
 make
 ```
+#### Windows
 
 ```sh
 set IDASDK=C:\Program Files\IDA Pro 7.3\idasdk73
@@ -110,11 +116,15 @@ IDATag loads automatically when an IDB is opened. To open the view, you may use 
 
 The Tag Overview is a dockable widget that provides view of the referenced tags. 
 
+![alt-text](img/gif_1.gif)
+
 These tags can come from multiple entry points:
 * IDB functions 
 * IDB names 
 * Disassembly 
 * External JSON tag file
+
+![alt-text](img/gif_5.gif)
 
 The JSON tag file is a pivot to each IDATag client. 
 
@@ -142,6 +152,8 @@ For instance, the following JSON is used to tag a specific offset with two tags:
 * Feeder : signature of the tag
 
 Each tag in the IDATag view is displayed with a specific colour corresponding to its feeder (tag signature).
+
+![alt-text](img/gif_4.gif)
 
 This table can be sorted by column, and entries can be double clicked to jump to their corresponding disassembly. Moreover, multiple filters are available to facilitate the navigation:
 * Keep only tagged offsets
@@ -176,10 +188,14 @@ Also, IDATag contextual menu is accessible from different views:
 * Names view
 * Disassembly view
 
+![alt-text](img/gif_3.gif)
+
 ## Configuration
 
 The plugin can be configured with a specific folder to store tag files and username.
 The menu is accessible at 'Edit > [IDATag] Configuration'.
+
+![alt-text](img/gif_2.gif)
 
 ## IDA integration
 

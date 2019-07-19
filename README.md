@@ -218,7 +218,6 @@ This hash value should correspond to the hashsum of the binary.
 		"tag": "crypto",
 		"offset": 5065078,
 		"feeder": "tagcrypt"
-		"feeder": "tagcrypt"
 	}
 ]
 ```
@@ -232,5 +231,6 @@ Several clients are provided in the `client` folder:
 * TagMetaRebase - rebase tags
 * TagPcap - extract tags from Icebox pcap file
 * TagAPI - generate tags based on IAT xrefs
+* TagFuncRefs - generate tags based on function xrefs
 * TagSource - generate tags based on source file strings
 * TagString - generate tags based on strings
